@@ -14,4 +14,9 @@ libarpack_la_SOURCES = \
         cgetv0.f csortc.f cstatn.f \
         \
         znaitr.f znapps.f znaup2.f znaupd.f zneigh.f zneupd.f zngets.f \
-        zgetv0.f zsortc.f zstatn.f
+        zgetv0.f zsortc.f zstatn.f \
+	../UTIL/arscnd.f  ../UTIL/dvout.f   ../UTIL/iswap.f  ../UTIL/zmout.f \
+	../UTIL/cmout.f   ../UTIL/icnteq.f  ../UTIL/ivout.f  ../UTIL/zvout.f \
+	../UTIL/cvout.f   ../UTIL/icopy.f   ../UTIL/smout.f \
+	../UTIL/dmout.f   ../UTIL/iset.f    ../UTIL/svout.f
+
