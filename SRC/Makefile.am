@@ -1,4 +1,6 @@
 lib_LTLIBRARIES     = libarpack.la
+libarpack_la_LDFLAGS = -version-info 2
+
 libarpack_la_SOURCES = \
         sgetv0.f slaqrb.f sstqrb.f ssortc.f ssortr.f sstatn.f sstats.f \
 	snaitr.f snapps.f snaup2.f snaupd.f snconv.f sneigh.f sngets.f \
