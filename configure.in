@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
 
-AC_INIT([arpack], [0.90], [inform@tiker.net])
+AC_INIT([arpack], [0.91], [inform@tiker.net])
 
 AM_INIT_AUTOMAKE([1.9 foreign])
 
