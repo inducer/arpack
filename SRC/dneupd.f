@@ -699,7 +699,7 @@ c        | Place the computed eigenvalues of H into DR and DI |
 c        | if a spectral transformation was not used.         |
 c        %----------------------------------------------------%
 c
-         if (nconv .ge. nev+1)
+         if (nconv .ge. nev+1) then
             nconv = nev+1
          end if
 
