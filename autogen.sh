@@ -1,7 +1,7 @@
 #! /bin/sh
 
 LIBTOOLIZE=libtoolize
-if ! which libtoolize &>/dev/null; then
+if ! which libtoolize ; then
   # mac osx
   LIBTOOLIZE=glibtoolize
 fi
