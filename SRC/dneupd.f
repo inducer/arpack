@@ -699,6 +699,10 @@ c        | Place the computed eigenvalues of H into DR and DI |
 c        | if a spectral transformation was not used.         |
 c        %----------------------------------------------------%
 c
+         if (nconv .ge. nev)
+            nconv = nev
+         end if
+
          if (type .eq. 'REGULR') then 
             call dcopy (nconv, workl(iheigr), 1, dr, 1)
             call dcopy (nconv, workl(iheigi), 1, di, 1)
