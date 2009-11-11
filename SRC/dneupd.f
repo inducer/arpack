@@ -699,8 +699,8 @@ c        | Place the computed eigenvalues of H into DR and DI |
 c        | if a spectral transformation was not used.         |
 c        %----------------------------------------------------%
 c
-         if (nconv .ge. nev)
-            nconv = nev
+         if (nconv .ge. nev+1)
+            nconv = nev+1
          end if
 
          if (type .eq. 'REGULR') then 
