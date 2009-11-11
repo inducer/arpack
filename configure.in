@@ -7,6 +7,7 @@ AC_INIT([arpack], [0.92], [inform@tiker.net])
 AM_INIT_AUTOMAKE([1.9 foreign])
 
 AC_PROG_FC
+AC_PROG_F77
 AC_PROG_LIBTOOL
 AC_SUBST(LIBTOOL_DEPS)
 
