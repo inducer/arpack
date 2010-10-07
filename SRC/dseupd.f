@@ -563,53 +563,54 @@ c
             leftptr = 1
             rghtptr = ncv
 c
-            if (ncv .eq. 1) go to 30
+            if (.not. (ncv .eq. 1)) then
 c
- 20         if (select(leftptr)) then
+ 20             if (select(leftptr)) then
 c
-c              %-------------------------------------------%
-c              | Search, from the left, for the first Ritz |
-c              | value that has not converged.             |
-c              %-------------------------------------------%
+c                   %-------------------------------------------%
+c                   | Search, from the left, for the first Ritz |
+c                   | value that has not converged.             |
+c                   %-------------------------------------------%
 c
-               leftptr = leftptr + 1
+                    leftptr = leftptr + 1
 c
-            else if ( .not. select(rghtptr)) then
+                else if ( .not. select(rghtptr)) then
 c
-c              %----------------------------------------------%
-c              | Search, from the right, the first Ritz value |
-c              | that has converged.                          |
-c              %----------------------------------------------%
+c                   %----------------------------------------------%
+c                   | Search, from the right, the first Ritz value |
+c                   | that has converged.                          |
+c                   %----------------------------------------------%
 c
-               rghtptr = rghtptr - 1
+                    rghtptr = rghtptr - 1
 c
-            else
+                else
 c
-c              %----------------------------------------------%
-c              | Swap the Ritz value on the left that has not |
-c              | converged with the Ritz value on the right   |
-c              | that has converged.  Swap the associated     |
-c              | eigenvector of the tridiagonal matrix H as   |
-c              | well.                                        |
-c              %----------------------------------------------%
+c                   %----------------------------------------------%
+c                   | Swap the Ritz value on the left that has not |
+c                   | converged with the Ritz value on the right   |
+c                   | that has converged.  Swap the associated     |
+c                   | eigenvector of the tridiagonal matrix H as   |
+c                   | well.                                        |
+c                   %----------------------------------------------%
 c
-               temp = workl(ihd+leftptr-1)
-               workl(ihd+leftptr-1) = workl(ihd+rghtptr-1)
-               workl(ihd+rghtptr-1) = temp
-               call dcopy (ncv, workl(iq+ncv*(leftptr-1)), 1,
-     &                    workl(iw), 1)
-               call dcopy (ncv, workl(iq+ncv*(rghtptr-1)), 1,
-     &                    workl(iq+ncv*(leftptr-1)), 1)
-               call dcopy (ncv, workl(iw), 1,
-     &                    workl(iq+ncv*(rghtptr-1)), 1)
-               leftptr = leftptr + 1
-               rghtptr = rghtptr - 1
+                    temp = workl(ihd+leftptr-1)
+                    workl(ihd+leftptr-1) = workl(ihd+rghtptr-1)
+                    workl(ihd+rghtptr-1) = temp
+                    call dcopy (ncv, workl(iq+ncv*(leftptr-1)), 1,
+     &                         workl(iw), 1)
+                    call dcopy (ncv, workl(iq+ncv*(rghtptr-1)), 1,
+     &                          workl(iq+ncv*(leftptr-1)), 1)
+                    call dcopy (ncv, workl(iw), 1,
+     &                          workl(iq+ncv*(rghtptr-1)), 1)
+                    leftptr = leftptr + 1
+                    rghtptr = rghtptr - 1
+c
+                end if
+c
+                if (leftptr .lt. rghtptr) go to 20
 c
             end if
-c
-            if (leftptr .lt. rghtptr) go to 20
-c
- 30      end if
+         end if
 c
          if (msglvl .gt. 2) then
              call dvout  (logfil, ncv, workl(ihd), ndigit,
