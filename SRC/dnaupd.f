@@ -379,7 +379,7 @@ c\Routines called:
 c     dnaup2   ARPACK routine that implements the Implicitly Restarted
 c             Arnoldi Iteration.
 c     ivout   ARPACK utility routine that prints integers.
-c     second  ARPACK utility routine for timing.
+c     ARSCND  ARPACK utility routine for timing.
 c     dvout    ARPACK utility routine that prints vectors.
 c     AR_DLAMCH   LAPACK routine that determines machine constants.
 c
@@ -454,7 +454,7 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   dnaup2 , dvout , ivout, second, dstatn 
+      external   dnaup2 , dvout , ivout, ARSCND, dstatn 
 c
 c     %--------------------%
 c     | External Functions |
@@ -476,7 +476,7 @@ c        | & message level for debugging |
 c        %-------------------------------%
 c
          call dstatn 
-         call second (t0)
+         call ARSCND (t0)
          msglvl = mnaupd
 c
 c        %----------------%
@@ -640,7 +640,7 @@ c
      &               '_naupd: Associated Ritz estimates')
       end if
 c
-      call second (t1)
+      call ARSCND (t1)
       tnaupd = t1 - t0
 c
       if (msglvl .gt. 0) then

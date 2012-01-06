@@ -135,7 +135,7 @@ c     zneigh   ARPACK compute Ritz values and error bounds routine.
 c     zngets   ARPACK reorder Ritz values and error bounds routine.
 c     zsortc   ARPACK sorting routine.
 c     ivout   ARPACK utility routine that prints integers.
-c     second  ARPACK utility routine for timing.
+c     ARSCND  ARPACK utility routine for timing.
 c     zmout    ARPACK utility routine that prints matrices
 c     zvout    ARPACK utility routine that prints vectors.
 c     dvout    ARPACK utility routine that prints vectors.
@@ -240,7 +240,7 @@ c     | External Subroutines |
 c     %----------------------%
 c
       external   zcopy , zgetv0 , znaitr , zneigh , zngets , znapps ,
-     &           zsortc , zswap , zmout , zvout , ivout, second
+     &           zsortc , zswap , zmout , zvout , ivout, ARSCND
 c
 c     %--------------------%
 c     | External functions |
@@ -264,7 +264,7 @@ c     %-----------------------%
 c
       if (ido .eq. 0) then
 c 
-         call second (t0)
+         call ARSCND (t0)
 c 
          msglvl = mcaup2
 c 
@@ -724,7 +724,7 @@ c        | the first step of the next call to znaitr .  |
 c        %---------------------------------------------%
 c
          cnorm = .true.
-         call second (t2)
+         call ARSCND (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             call zcopy  (n, resid, 1, workd(n+1), 1)
@@ -749,7 +749,7 @@ c        | WORKD(1:N) := B*RESID            |
 c        %----------------------------------%
 c
          if (bmat .eq. 'G') then
-            call second (t3)
+            call ARSCND (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if
 c 
@@ -788,7 +788,7 @@ c     %------------%
 c     | Error Exit |
 c     %------------%
 c
-      call second (t1)
+      call ARSCND (t1)
       tcaup2 = t1 - t0
 c     
  9000 continue

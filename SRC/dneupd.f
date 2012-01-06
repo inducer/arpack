@@ -97,7 +97,7 @@ c
 c          The complex Ritz vector associated with the Ritz value 
 c          with positive imaginary part is stored in two consecutive 
 c          columns.  The first column holds the real part of the Ritz 
-c          vector and the second column holds the imaginary part.  The 
+c          vector and the ARSCND column holds the imaginary part.  The 
 c          Ritz vector associated with the Ritz value with negative 
 c          imaginary part is simply the complex conjugate of the Ritz vector 
 c          associated with the positive imaginary part.

@@ -380,7 +380,7 @@ c             Arnoldi Iteration.
 c     dstats   ARPACK routine that initialize timing and other statistics
 c             variables.
 c     ivout   ARPACK utility routine that prints integers.
-c     second  ARPACK utility routine for timing.
+c     ARSCND  ARPACK utility routine for timing.
 c     dvout    ARPACK utility routine that prints vectors.
 c     AR_DLAMCH   LAPACK routine that determines machine constants.
 c
@@ -456,7 +456,7 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   dsaup2 ,  dvout , ivout, second, dstats 
+      external   dsaup2 ,  dvout , ivout, ARSCND, dstats 
 c
 c     %--------------------%
 c     | External Functions |
@@ -478,7 +478,7 @@ c        | & message level for debugging |
 c        %-------------------------------%
 c
          call dstats 
-         call second (t0)
+         call ARSCND (t0)
          msglvl = msaupd
 c
          ierr   = 0
@@ -638,7 +638,7 @@ c
      &               '_saupd: corresponding error bounds')
       end if 
 c
-      call second (t1)
+      call ARSCND (t1)
       tsaupd = t1 - t0
 c 
       if (msglvl .gt. 0) then

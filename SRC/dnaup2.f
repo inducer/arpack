@@ -29,7 +29,7 @@ c          If ISHIFT=0, NP is the number of shifts the user needs
 c          to provide via reverse comunication. 0 < NP < NCV-NEV.
 c          NP may be less than NCV-NEV for two reasons. The first, is
 c          to keep complex conjugate pairs of "wanted" Ritz values 
-c          together. The second, is that a leading block of the current
+c          together. The ARSCND, is that a leading block of the current
 c          upper Hessenberg matrix has split off and contains "unwanted"
 c          Ritz values.
 c          Upon termination of the IRA iteration, NP contains the number 
@@ -143,7 +143,7 @@ c     dneigh   ARPACK compute Ritz values and error bounds routine.
 c     dngets   ARPACK reorder Ritz values and error bounds routine.
 c     dsortc   ARPACK sorting routine.
 c     ivout   ARPACK utility routine that prints integers.
-c     second  ARPACK utility routine for timing.
+c     ARSCND  ARPACK utility routine for timing.
 c     dmout    ARPACK utility routine that prints matrices
 c     dvout    ARPACK utility routine that prints vectors.
 c     AR_DLAMCH   LAPACK routine that determines machine constants.
@@ -236,7 +236,7 @@ c     | External Subroutines |
 c     %----------------------%
 c
       external   dcopy  , dgetv0 , dnaitr , dnconv , dneigh , 
-     &           dngets , dnapps , dvout  , ivout , second
+     &           dngets , dnapps , dvout  , ivout , ARSCND
 c
 c     %--------------------%
 c     | External Functions |
@@ -258,7 +258,7 @@ c     %-----------------------%
 c
       if (ido .eq. 0) then
 c 
-         call second (t0)
+         call ARSCND (t0)
 c 
          msglvl = mnaup2
 c 
@@ -758,7 +758,7 @@ c        | the first step of the next call to dnaitr .  |
 c        %---------------------------------------------%
 c
          cnorm = .true.
-         call second (t2)
+         call ARSCND (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             call dcopy  (n, resid, 1, workd(n+1), 1)
@@ -783,7 +783,7 @@ c        | WORKD(1:N) := B*RESID            |
 c        %----------------------------------%
 c
          if (bmat .eq. 'G') then
-            call second (t3)
+            call ARSCND (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if
 c 
@@ -822,7 +822,7 @@ c     %------------%
 c     | Error Exit |
 c     %------------%
 c
-      call second (t1)
+      call ARSCND (t1)
       tnaup2 = t1 - t0
 c     
  9000 continue

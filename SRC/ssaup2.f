@@ -48,7 +48,7 @@ c
 c  H       Real (NEV+NP) by 2 array.  (OUTPUT)
 c          H is used to store the generated symmetric tridiagonal matrix
 c          The subdiagonal is stored in the first column of H starting 
-c          at H(2,1).  The main diagonal is stored in the second column
+c          at H(2,1).  The main diagonal is stored in the ARSCND column
 c          of H starting at H(1,2). If ssaup2 converges store the 
 c          B-norm of the final residual vector in H(1,1).
 c
@@ -148,7 +148,7 @@ c     sseigt  ARPACK compute Ritz values and error bounds routine.
 c     ssgets  ARPACK reorder Ritz values and error bounds routine.
 c     ssortr  ARPACK sorting routine.
 c     ivout   ARPACK utility routine that prints integers.
-c     second  ARPACK utility routine for timing.
+c     ARSCND  ARPACK utility routine for timing.
 c     svout   ARPACK utility routine that prints vectors.
 c     AR_SLAMCH  LAPACK routine that determines machine constants.
 c     scopy   Level 1 BLAS that copies one vector to another.
@@ -235,7 +235,7 @@ c     | External Subroutines |
 c     %----------------------%
 c
       external   scopy, sgetv0, ssaitr, sscal, ssconv, sseigt, ssgets, 
-     &           ssapps, ssortr, svout, ivout, second, sswap
+     &           ssapps, ssortr, svout, ivout, ARSCND, sswap
 c
 c     %--------------------%
 c     | External Functions |
@@ -262,7 +262,7 @@ c        | Initialize timing statistics  |
 c        | & message level for debugging |
 c        %-------------------------------%
 c
-         call second (t0)
+         call ARSCND (t0)
          msglvl = msaup2
 c
 c        %---------------------------------%
@@ -770,7 +770,7 @@ c        | the first step of the next call to ssaitr.  |
 c        %---------------------------------------------%
 c
          cnorm = .true.
-         call second (t2)
+         call ARSCND (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             call scopy (n, resid, 1, workd(n+1), 1)
@@ -795,7 +795,7 @@ c        | WORKD(1:N) := B*RESID            |
 c        %----------------------------------%
 c
          if (bmat .eq. 'G') then
-            call second (t3)
+            call ARSCND (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if
 c 
@@ -837,7 +837,7 @@ c     %------------%
 c     | Error exit |
 c     %------------%
 c
-      call second (t1)
+      call ARSCND (t1)
       tsaup2 = t1 - t0
 c 
  9000 continue

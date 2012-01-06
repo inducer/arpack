@@ -88,7 +88,7 @@ c
 c  H       Real (K+NP) by 2 array.  (INPUT/OUTPUT)
 c          H is used to store the generated symmetric tridiagonal matrix
 c          with the subdiagonal in the first column starting at H(2,1)
-c          and the main diagonal in the second column.
+c          and the main diagonal in the ARSCND column.
 c
 c  LDH     Integer.  (INPUT)
 c          Leading dimension of H exactly as declared in the calling 
@@ -262,7 +262,7 @@ c     | External Subroutines |
 c     %----------------------%
 c
       external   saxpy, scopy, sscal, sgemv, sgetv0, svout, smout,
-     &           AR_SLASCL, ivout, second
+     &           AR_SLASCL, ivout, ARSCND
 c
 c     %--------------------%
 c     | External Functions |
@@ -300,7 +300,7 @@ c        | Initialize timing statistics  |
 c        | & message level for debugging |
 c        %-------------------------------%
 c
-         call second (t0)
+         call ARSCND (t0)
          msglvl = msaitr
 c 
 c        %------------------------------%
@@ -420,7 +420,7 @@ c              | which spans OP and exit.                       |
 c              %------------------------------------------------%
 c
                info = j - 1
-               call second (t1)
+               call ARSCND (t1)
                tsaitr = tsaitr + (t1 - t0)
                ido = 99
                go to 9000
@@ -460,7 +460,7 @@ c        %------------------------------------------------------%
 c
          step3 = .true.
          nopx  = nopx + 1
-         call second (t2)
+         call ARSCND (t2)
          call scopy (n, v(1,j), 1, workd(ivj), 1)
          ipntr(1) = ivj
          ipntr(2) = irj
@@ -479,7 +479,7 @@ c        | Back from reverse communication;  |
 c        | WORKD(IRJ:IRJ+N-1) := OP*v_{j}.   |
 c        %-----------------------------------%
 c
-         call second (t3)
+         call ARSCND (t3)
          tmvopx = tmvopx + (t3 - t2)
 c 
          step3 = .false.
@@ -500,7 +500,7 @@ c        | assumed to have A*v_{j}.                  |
 c        %-------------------------------------------%
 c
          if (mode .eq. 2) go to 65
-         call second (t2)
+         call ARSCND (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             step4 = .true.
@@ -524,7 +524,7 @@ c        | WORKD(IPJ:IPJ+N-1) := B*OP*v_{j}. |
 c        %-----------------------------------%
 c
          if (bmat .eq. 'G') then
-            call second (t3)
+            call ARSCND (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if 
 c
@@ -592,12 +592,12 @@ c
          else
             h(j,1) = rnorm
          end if
-         call second (t4)
+         call ARSCND (t4)
 c 
          orth1 = .true.
          iter  = 0
 c 
-         call second (t2)
+         call ARSCND (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             call scopy (n, resid, 1, workd(irj), 1)
@@ -621,7 +621,7 @@ c        | WORKD(IPJ:IPJ+N-1) := B*r_{j}.                    |
 c        %---------------------------------------------------%
 c
          if (bmat .eq. 'G') then
-            call second (t3)
+            call ARSCND (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if
 c 
@@ -695,7 +695,7 @@ c
          h(j,2) = h(j,2) + workd(irj + j - 1)
 c 
          orth2 = .true.
-         call second (t2)
+         call ARSCND (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             call scopy (n, resid, 1, workd(irj), 1)
@@ -719,7 +719,7 @@ c        | Back from reverse communication if ORTH2 = .true. |
 c        %---------------------------------------------------%
 c
          if (bmat .eq. 'G') then
-            call second (t3)
+            call ARSCND (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if
 c
@@ -791,7 +791,7 @@ c
          rstart = .false.
          orth2  = .false.
 c 
-         call second (t5)
+         call ARSCND (t5)
          titref = titref + (t5 - t4)
 c 
 c        %----------------------------------------------------------%
@@ -815,7 +815,7 @@ c        %------------------------------------%
 c
          j = j + 1
          if (j .gt. k+np) then
-            call second (t1)
+            call ARSCND (t1)
             tsaitr = tsaitr + (t1 - t0)
             ido = 99
 c

@@ -97,7 +97,7 @@ c     pp 357-385.
 c
 c\Routines called:
 c     ivout   ARPACK utility routine that prints integers.
-c     second  ARPACK utility routine for timing.
+c     ARSCND  ARPACK utility routine for timing.
 c     dmout   ARPACK utility routine that prints matrices.
 c     dvout   ARPACK utility routine that prints vectors.
 c     AR_DLABAD  LAPACK routine that computes machine constants.
@@ -189,7 +189,7 @@ c     | External Subroutines |
 c     %----------------------%
 c
       external   daxpy, dcopy, dscal, AR_DLACPY, AR_DLARFG, AR_DLARF,
-     &           AR_DLASET, AR_DLABAD, second, AR_DLARTG
+     &           AR_DLASET, AR_DLABAD, ARSCND, AR_DLARTG
 c
 c     %--------------------%
 c     | External Functions |
@@ -237,7 +237,7 @@ c     | Initialize timing statistics  |
 c     | & message level for debugging |
 c     %-------------------------------%
 c
-      call second (t0)
+      call ARSCND (t0)
       msglvl = mnapps
       kplusp = kev + np 
 c 
@@ -635,7 +635,7 @@ c
       end if
 c 
  9000 continue
-      call second (t1)
+      call ARSCND (t1)
       tnapps = tnapps + (t1 - t0)
 c 
       return

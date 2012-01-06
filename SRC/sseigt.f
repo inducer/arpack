@@ -22,7 +22,7 @@ c
 c  H       Real N by 2 array.  (INPUT)
 c          H contains the symmetric tridiagonal matrix with the 
 c          subdiagonal in the first column starting at H(2,1) and the 
-c          main diagonal in second column.
+c          main diagonal in ARSCND column.
 c
 c  LDH     Integer.  (INPUT)
 c          Leading dimension of H exactly as declared in the calling 
@@ -59,7 +59,7 @@ c\Routines called:
 c     sstqrb  ARPACK routine that computes the eigenvalues and the
 c             last components of the eigenvectors of a symmetric
 c             and tridiagonal matrix.
-c     second  ARPACK utility routine for timing.
+c     ARSCND  ARPACK utility routine for timing.
 c     svout   ARPACK utility routine that prints vectors.
 c     scopy   Level 1 BLAS that copies one vector to another.
 c
@@ -127,7 +127,7 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   scopy, sstqrb, svout, second
+      external   scopy, sstqrb, svout, ARSCND
 c
 c     %-----------------------%
 c     | Executable Statements |
@@ -138,7 +138,7 @@ c     | Initialize timing statistics  |
 c     | & message level for debugging |
 c     %-------------------------------% 
 c
-      call second (t0)
+      call ARSCND (t0)
       msglvl = mseigt
 c
       if (msglvl .gt. 0) then
@@ -168,7 +168,7 @@ c
          bounds(k) = rnorm*abs(bounds(k))
    30 continue
 c 
-      call second (t1)
+      call ARSCND (t1)
       tseigt = tseigt + (t1 - t0)
 c
  9000 continue
