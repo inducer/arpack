@@ -30,7 +30,7 @@
 #
 # Needed for compiling the examples
 #
-home = /home/serban/Software/Build/Temp/lib
+home = 
 #
 #  %--------------------------------------%
 #  | The platform identifier to suffix to |
@@ -68,9 +68,9 @@ DIRS         = $(UTILdir) $(SRCdir)
 #
 # Needed for compiling the examples
 #
-ARPACKLIB  = $(home)/libarpack.a
-LAPACKLIB = -llapack
-BLASLIB = -lptf77blas -lptcblas -latlas -lpthread
+ARPACKLIB  = ../../SRC/.libs/libarpack.a
+LAPACKLIB = 
+BLASLIB = 
 #
 ALIBS =  $(ARPACKLIB) $(LAPACKLIB) $(BLASLIB)
 #
