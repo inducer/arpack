@@ -132,7 +132,7 @@ c          = -5: WHICH must be one of 'LM', 'SM', 'LA', 'SA' or 'BE'.
 c          = -6: BMAT must be one of 'I' or 'G'.
 c          = -7: Length of private work WORKL array is not sufficient.
 c          = -8: Error return from trid. eigenvalue calculation;
-c                Information error from LAPACK routine ssteqr.
+c                Information error from LAPACK routine AR_SSTEQR.
 c          = -9: Starting vector is zero.
 c          = -10: IPARAM(7) must be 1,2,3,4,5.
 c          = -11: IPARAM(7) = 1 and BMAT = 'G' are incompatible.
@@ -183,13 +183,13 @@ c             corresponding permutation to a matrix A.
 c     ssortr  ssortr  ARPACK sorting routine.
 c     ivout   ARPACK utility routine that prints integers.
 c     svout   ARPACK utility routine that prints vectors.
-c     sgeqr2  LAPACK routine that computes the QR factorization of
+c     AR_SGEQR2  LAPACK routine that computes the QR factorization of
 c             a matrix.
-c     slacpy  LAPACK matrix copy routine.
-c     slamch  LAPACK routine that determines machine constants.
-c     sorm2r  LAPACK routine that applies an orthogonal matrix in
+c     AR_SLACPY  LAPACK matrix copy routine.
+c     AR_SLAMCH  LAPACK routine that determines machine constants.
+c     AR_SORM2R  LAPACK routine that applies an orthogonal matrix in
 c             factored form.
-c     ssteqr  LAPACK routine that computes eigenvalues and eigenvectors
+c     AR_SSTEQR  LAPACK routine that computes eigenvalues and eigenvectors
 c             of a tridiagonal matrix.
 c     sger    Level 2 BLAS rank one update to a matrix.
 c     scopy   Level 1 BLAS that copies one vector to another .
@@ -275,16 +275,16 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   scopy , sger  , sgeqr2, slacpy, sorm2r, sscal, 
-     &           ssesrt, ssteqr, sswap , svout , ivout , ssortr
+      external   scopy , sger  , AR_SGEQR2, AR_SLACPY, AR_SORM2R, sscal, 
+     &           ssesrt, AR_SSTEQR, sswap , svout , ivout , ssortr
 c
 c     %--------------------%
 c     | External Functions |
 c     %--------------------%
 c
       Real 
-     &           snrm2, slamch
-      external   snrm2, slamch
+     &           snrm2, AR_SLAMCH
+      external   snrm2, AR_SLAMCH
 c
 c     %---------------------%
 c     | Intrinsic Functions |
@@ -388,10 +388,10 @@ c     |       wanted values. If MODE = 1,2 then will equal    |
 c     |       workl(3*ncv+1:4*ncv).                           |
 c     | workl(6*ncv+1:6*ncv+ncv*ncv) := orthogonal Q that is  |
 c     |       the eigenvector matrix for H as returned by     |
-c     |       ssteqr. Not referenced if RVEC = .False.        |
+c     |       AR_SSTEQR. Not referenced if RVEC = .False.        |
 c     |       Ordering follows that of workl(4*ncv+1:5*ncv)   |
 c     | workl(6*ncv+ncv*ncv+1:6*ncv+ncv*ncv+2*ncv) :=         |
-c     |       Workspace. Needed by ssteqr and by sseupd.      |
+c     |       Workspace. Needed by AR_SSTEQR and by sseupd.      |
 c     | GRAND total of NCV*(NCV+8) locations.                 |
 c     %-------------------------------------------------------%
 c
@@ -427,7 +427,7 @@ c     %---------------------------------%
 c     | Set machine dependent constant. |
 c     %---------------------------------%
 c
-      eps23 = slamch('Epsilon-Machine') 
+      eps23 = AR_SLAMCH('Epsilon-Machine') 
       eps23 = eps23**(2.0E+0  / 3.0E+0 )
 c
 c     %---------------------------------------%
@@ -533,7 +533,7 @@ c
          call scopy(ncv-1, workl(ih+1), 1, workl(ihb), 1)
          call scopy(ncv, workl(ih+ldh), 1, workl(ihd), 1)
 c
-         call ssteqr('Identity', ncv, workl(ihd), workl(ihb),
+         call AR_SSTEQR('Identity', ncv, workl(ihd), workl(ihb),
      &                workl(iq) , ldq, workl(iw), ierr)
 c
          if (ierr .ne. 0) then
@@ -563,54 +563,53 @@ c
             leftptr = 1
             rghtptr = ncv
 c
-            if (.not. (ncv .eq. 1)) then
+            if (ncv .eq. 1) go to 30
 c
- 20             if (select(leftptr)) then
+ 20         if (select(leftptr)) then
 c
-c                   %-------------------------------------------%
-c                   | Search, from the left, for the first Ritz |
-c                   | value that has not converged.             |
-c                   %-------------------------------------------%
+c              %-------------------------------------------%
+c              | Search, from the left, for the first Ritz |
+c              | value that has not converged.             |
+c              %-------------------------------------------%
 c
-                    leftptr = leftptr + 1
+               leftptr = leftptr + 1
 c
-                else if ( .not. select(rghtptr)) then
+            else if ( .not. select(rghtptr)) then
 c
-c                   %----------------------------------------------%
-c                   | Search, from the right, the first Ritz value |
-c                   | that has converged.                          |
-c                   %----------------------------------------------%
+c              %----------------------------------------------%
+c              | Search, from the right, the first Ritz value |
+c              | that has converged.                          |
+c              %----------------------------------------------%
 c
-                    rghtptr = rghtptr - 1
+               rghtptr = rghtptr - 1
 c
-                else
+            else
 c
-c                   %----------------------------------------------%
-c                   | Swap the Ritz value on the left that has not |
-c                   | converged with the Ritz value on the right   |
-c                   | that has converged.  Swap the associated     |
-c                   | eigenvector of the tridiagonal matrix H as   |
-c                   | well.                                        |
-c                   %----------------------------------------------%
+c              %----------------------------------------------%
+c              | Swap the Ritz value on the left that has not |
+c              | converged with the Ritz value on the right   |
+c              | that has converged.  Swap the associated     |
+c              | eigenvector of the tridiagonal matrix H as   |
+c              | well.                                        |
+c              %----------------------------------------------%
 c
-                    temp = workl(ihd+leftptr-1)
-                    workl(ihd+leftptr-1) = workl(ihd+rghtptr-1)
-                    workl(ihd+rghtptr-1) = temp
-                    call scopy(ncv, workl(iq+ncv*(leftptr-1)), 1,
-     &                         workl(iw), 1)
-                    call scopy(ncv, workl(iq+ncv*(rghtptr-1)), 1,
-     &                         workl(iq+ncv*(leftptr-1)), 1)
-                    call scopy(ncv, workl(iw), 1,
-     &                         workl(iq+ncv*(rghtptr-1)), 1)
-                    leftptr = leftptr + 1
-                    rghtptr = rghtptr - 1
-c
-                end if
-c
-                if (leftptr .lt. rghtptr) go to 20
+               temp = workl(ihd+leftptr-1)
+               workl(ihd+leftptr-1) = workl(ihd+rghtptr-1)
+               workl(ihd+rghtptr-1) = temp
+               call scopy(ncv, workl(iq+ncv*(leftptr-1)), 1,
+     &                    workl(iw), 1)
+               call scopy(ncv, workl(iq+ncv*(rghtptr-1)), 1,
+     &                    workl(iq+ncv*(leftptr-1)), 1)
+               call scopy(ncv, workl(iw), 1,
+     &                    workl(iq+ncv*(rghtptr-1)), 1)
+               leftptr = leftptr + 1
+               rghtptr = rghtptr - 1
 c
             end if
-         end if
+c
+            if (leftptr .lt. rghtptr) go to 20
+c
+ 30      end if
 c
          if (msglvl .gt. 2) then
              call svout (logfil, ncv, workl(ihd), ndigit,
@@ -728,7 +727,7 @@ c        | the wanted invariant subspace located in the first NCONV |
 c        | columns of workl(iq,ldq).                                |
 c        %----------------------------------------------------------%
 c     
-         call sgeqr2(ncv, nconv        , workl(iq) ,
+         call AR_SGEQR2(ncv, nconv        , workl(iq) ,
      &                ldq, workl(iw+ncv), workl(ihb),
      &                ierr)
 c
@@ -740,11 +739,11 @@ c        | of the approximate invariant subspace associated with  |
 c        | the Ritz values in workl(ihd).                         |
 c        %--------------------------------------------------------%
 c     
-         call sorm2r('Right', 'Notranspose', n        ,
+         call AR_SORM2R('Right', 'Notranspose', n        ,
      &                ncv    , nconv        , workl(iq),
      &                ldq    , workl(iw+ncv), v        ,
      &                ldv    , workd(n+1)   , ierr)
-         call slacpy('All', n, nconv, v, ldv, z, ldz)
+         call AR_SLACPY('All', n, nconv, v, ldv, z, ldz)
 c
 c        %-----------------------------------------------------%
 c        | In order to compute the Ritz estimates for the Ritz |
@@ -756,7 +755,7 @@ c
             workl(ihb+j-1) = zero 
   65     continue
          workl(ihb+ncv-1) = one
-         call sorm2r('Left', 'Transpose'  , ncv       ,
+         call AR_SORM2R('Left', 'Transpose'  , ncv       ,
      &                1     , nconv        , workl(iq) ,
      &                ldq   , workl(iw+ncv), workl(ihb),
      &                ncv   , temp         , ierr)

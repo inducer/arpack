@@ -38,9 +38,9 @@ c\Local variables:
 c     xxxxxx  real
 c
 c\Routines called:
-c     arscnd  ARPACK utility routine for timing.
-c     dlamch  LAPACK routine that determines machine constants.
-c     dlapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
+c     second  ARPACK utility routine for timing.
+c     AR_DLAMCH  LAPACK routine that determines machine constants.
+c     AR_DLAPY2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
 c
 c\Author
 c     Danny Sorensen               Phuong Vu
@@ -100,8 +100,8 @@ c     | External Functions |
 c     %--------------------%
 c
       Double precision
-     &           dlapy2, dlamch
-      external   dlapy2, dlamch
+     &           AR_DLAPY2, AR_DLAMCH
+      external   AR_DLAPY2, AR_DLAMCH
 
 c     %-----------------------%
 c     | Executable Statements |
@@ -119,22 +119,22 @@ c     |                                                             |
 c     | for some appropriate choice of norm.                        |
 c     %-------------------------------------------------------------%
 c
-      call arscnd (t0)
+      call second (t0)
 c
 c     %---------------------------------%
 c     | Get machine dependent constant. |
 c     %---------------------------------%
 c
-      eps23 = dlamch('Epsilon-Machine')
+      eps23 = AR_DLAMCH('Epsilon-Machine')
       eps23 = eps23**(2.0D+0 / 3.0D+0)
 c
       nconv  = 0
       do 20 i = 1, n
-         temp = max( eps23, dlapy2( ritzr(i), ritzi(i) ) )
+         temp = max( eps23, AR_DLAPY2( ritzr(i), ritzi(i) ) )
          if (bounds(i) .le. tol*temp)   nconv = nconv + 1
    20 continue
 c 
-      call arscnd (t1)
+      call second (t1)
       tnconv = tnconv + (t1 - t0)
 c 
       return

@@ -49,7 +49,7 @@ c          the front end.  This is needed to keep the full Schur form
 c          of H and also in the calculation of the eigenvectors of H.
 c
 c  IERR    Integer.  (OUTPUT)
-c          Error exit flag from dlaqrb or dtrevc.
+c          Error exit flag from dlaqrb or AR_DTREVC.
 c
 c\EndDoc
 c
@@ -63,12 +63,12 @@ c
 c\Routines called:
 c     dlaqrb  ARPACK routine to compute the real Schur form of an
 c             upper Hessenberg matrix and last row of the Schur vectors.
-c     arscnd  ARPACK utility routine for timing.
+c     second  ARPACK utility routine for timing.
 c     dmout   ARPACK utility routine that prints matrices
 c     dvout   ARPACK utility routine that prints vectors.
-c     dlacpy  LAPACK matrix copy routine.
-c     dlapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
-c     dtrevc  LAPACK routine to compute the eigenvectors of a matrix
+c     AR_DLACPY  LAPACK matrix copy routine.
+c     AR_DLAPY2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
+c     AR_DTREVC  LAPACK routine to compute the eigenvectors of a matrix
 c             in upper quasi-triangular form
 c     dgemv   Level 2 BLAS routine for matrix vector multiplication.
 c     dcopy   Level 1 BLAS that copies one vector to another .
@@ -144,15 +144,15 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   dcopy, dlacpy, dlaqrb, dtrevc, dvout, arscnd
+      external   dcopy, AR_DLACPY, dlaqrb, AR_DTREVC, dvout, second
 c
 c     %--------------------%
 c     | External Functions |
 c     %--------------------%
 c
       Double precision
-     &           dlapy2, dnrm2
-      external   dlapy2, dnrm2
+     &           AR_DLAPY2, dnrm2
+      external   AR_DLAPY2, dnrm2
 c
 c     %---------------------%
 c     | Intrinsic Functions |
@@ -170,7 +170,7 @@ c     | Initialize timing statistics  |
 c     | & message level for debugging |
 c     %-------------------------------%
 c
-      call arscnd (t0)
+      call second (t0)
       msglvl = mneigh
 c 
       if (msglvl .gt. 2) then
@@ -186,7 +186,7 @@ c     | dlaqrb returns the full Schur form of H in WORKL(1:N**2)  |
 c     | and the last components of the Schur vectors in BOUNDS.   |
 c     %-----------------------------------------------------------%
 c
-      call dlacpy ('All', n, n, h, ldh, workl, n)
+      call AR_DLACPY ('All', n, n, h, ldh, workl, n)
       call dlaqrb (.true., n, 1, n, workl, n, ritzr, ritzi, bounds,
      &             ierr)
       if (ierr .ne. 0) go to 9000
@@ -206,7 +206,7 @@ c     | of the eigenvector components are split across adjacent   |
 c     | columns of Q.                                             |
 c     %-----------------------------------------------------------%
 c
-      call dtrevc ('R', 'A', select, n, workl, n, vl, n, q, ldq,
+      call AR_DTREVC ('R', 'A', select, n, workl, n, vl, n, q, ldq,
      &             n, n, workl(n*n+1), ierr)
 c
       if (ierr .ne. 0) go to 9000
@@ -214,7 +214,7 @@ c
 c     %------------------------------------------------%
 c     | Scale the returning eigenvectors so that their |
 c     | euclidean norms are all one. LAPACK subroutine |
-c     | dtrevc returns each eigenvector normalized so  |
+c     | AR_DTREVC returns each eigenvector normalized so  |
 c     | that the element of largest magnitude has      |
 c     | magnitude 1; here the magnitude of a complex   |
 c     | number (x,y) is taken to be |x| + |y|.         |
@@ -241,7 +241,7 @@ c           | square root of two.                       |
 c           %-------------------------------------------%
 c
             if (iconj .eq. 0) then
-               temp = dlapy2( dnrm2( n, q(1,i), 1 ), 
+               temp = AR_DLAPY2( dnrm2( n, q(1,i), 1 ), 
      &                        dnrm2( n, q(1,i+1), 1 ) )
                call dscal ( n, one / temp, q(1,i), 1 )
                call dscal ( n, one / temp, q(1,i+1), 1 )
@@ -283,7 +283,7 @@ c           | of the last components of the two vectors |
 c           %-------------------------------------------%
 c
             if (iconj .eq. 0) then
-               bounds(i) = rnorm * dlapy2( workl(i), workl(i+1) )
+               bounds(i) = rnorm * AR_DLAPY2( workl(i), workl(i+1) )
                bounds(i+1) = bounds(i)
                iconj = 1
             else
@@ -301,7 +301,7 @@ c
      &              '_neigh: Ritz estimates for the eigenvalues of H')
       end if
 c
-      call arscnd (t1)
+      call second (t1)
       tneigh = tneigh + (t1 - t0)
 c
  9000 continue

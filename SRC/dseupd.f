@@ -132,7 +132,7 @@ c          = -5: WHICH must be one of 'LM', 'SM', 'LA', 'SA' or 'BE'.
 c          = -6: BMAT must be one of 'I' or 'G'.
 c          = -7: Length of private work WORKL array is not sufficient.
 c          = -8: Error return from trid. eigenvalue calculation;
-c                Information error from LAPACK routine dsteqr .
+c                Information error from LAPACK routine AR_DSTEQR .
 c          = -9: Starting vector is zero.
 c          = -10: IPARAM(7) must be 1,2,3,4,5.
 c          = -11: IPARAM(7) = 1 and BMAT = 'G' are incompatible.
@@ -183,13 +183,13 @@ c             corresponding permutation to a matrix A.
 c     dsortr   dsortr   ARPACK sorting routine.
 c     ivout   ARPACK utility routine that prints integers.
 c     dvout    ARPACK utility routine that prints vectors.
-c     dgeqr2   LAPACK routine that computes the QR factorization of
+c     AR_DGEQR2   LAPACK routine that computes the QR factorization of
 c             a matrix.
-c     dlacpy   LAPACK matrix copy routine.
-c     dlamch   LAPACK routine that determines machine constants.
-c     dorm2r   LAPACK routine that applies an orthogonal matrix in
+c     AR_DLACPY   LAPACK matrix copy routine.
+c     AR_DLAMCH   LAPACK routine that determines machine constants.
+c     AR_DORM2R   LAPACK routine that applies an orthogonal matrix in
 c             factored form.
-c     dsteqr   LAPACK routine that computes eigenvalues and eigenvectors
+c     AR_DSTEQR   LAPACK routine that computes eigenvalues and eigenvectors
 c             of a tridiagonal matrix.
 c     dger     Level 2 BLAS rank one update to a matrix.
 c     dcopy    Level 1 BLAS that copies one vector to another .
@@ -275,16 +275,16 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   dcopy  , dger   , dgeqr2 , dlacpy , dorm2r , dscal , 
-     &           dsesrt , dsteqr , dswap  , dvout  , ivout , dsortr 
+      external   dcopy  , dger   , AR_DGEQR2 , AR_DLACPY , AR_DORM2R , dscal , 
+     &           dsesrt , AR_DSTEQR , dswap  , dvout  , ivout , dsortr 
 c
 c     %--------------------%
 c     | External Functions |
 c     %--------------------%
 c
       Double precision 
-     &           dnrm2 , dlamch 
-      external   dnrm2 , dlamch 
+     &           dnrm2 , AR_DLAMCH 
+      external   dnrm2 , AR_DLAMCH 
 c
 c     %---------------------%
 c     | Intrinsic Functions |
@@ -388,10 +388,10 @@ c     |       wanted values. If MODE = 1,2 then will equal    |
 c     |       workl(3*ncv+1:4*ncv).                           |
 c     | workl(6*ncv+1:6*ncv+ncv*ncv) := orthogonal Q that is  |
 c     |       the eigenvector matrix for H as returned by     |
-c     |       dsteqr . Not referenced if RVEC = .False.        |
+c     |       AR_DSTEQR . Not referenced if RVEC = .False.        |
 c     |       Ordering follows that of workl(4*ncv+1:5*ncv)   |
 c     | workl(6*ncv+ncv*ncv+1:6*ncv+ncv*ncv+2*ncv) :=         |
-c     |       Workspace. Needed by dsteqr  and by dseupd .      |
+c     |       Workspace. Needed by AR_DSTEQR  and by dseupd .      |
 c     | GRAND total of NCV*(NCV+8) locations.                 |
 c     %-------------------------------------------------------%
 c
@@ -427,7 +427,7 @@ c     %---------------------------------%
 c     | Set machine dependent constant. |
 c     %---------------------------------%
 c
-      eps23 = dlamch ('Epsilon-Machine') 
+      eps23 = AR_DLAMCH ('Epsilon-Machine') 
       eps23 = eps23**(2.0D+0  / 3.0D+0 )
 c
 c     %---------------------------------------%
@@ -533,7 +533,7 @@ c
          call dcopy (ncv-1, workl(ih+1), 1, workl(ihb), 1)
          call dcopy (ncv, workl(ih+ldh), 1, workl(ihd), 1)
 c
-         call dsteqr ('Identity', ncv, workl(ihd), workl(ihb),
+         call AR_DSTEQR ('Identity', ncv, workl(ihd), workl(ihb),
      &                workl(iq) , ldq, workl(iw), ierr)
 c
          if (ierr .ne. 0) then
@@ -563,54 +563,53 @@ c
             leftptr = 1
             rghtptr = ncv
 c
-            if (.not. (ncv .eq. 1)) then
+            if (ncv .eq. 1) go to 30
 c
- 20             if (select(leftptr)) then
+ 20         if (select(leftptr)) then
 c
-c                   %-------------------------------------------%
-c                   | Search, from the left, for the first Ritz |
-c                   | value that has not converged.             |
-c                   %-------------------------------------------%
+c              %-------------------------------------------%
+c              | Search, from the left, for the first Ritz |
+c              | value that has not converged.             |
+c              %-------------------------------------------%
 c
-                    leftptr = leftptr + 1
+               leftptr = leftptr + 1
 c
-                else if ( .not. select(rghtptr)) then
+            else if ( .not. select(rghtptr)) then
 c
-c                   %----------------------------------------------%
-c                   | Search, from the right, the first Ritz value |
-c                   | that has converged.                          |
-c                   %----------------------------------------------%
+c              %----------------------------------------------%
+c              | Search, from the right, the first Ritz value |
+c              | that has converged.                          |
+c              %----------------------------------------------%
 c
-                    rghtptr = rghtptr - 1
+               rghtptr = rghtptr - 1
 c
-                else
+            else
 c
-c                   %----------------------------------------------%
-c                   | Swap the Ritz value on the left that has not |
-c                   | converged with the Ritz value on the right   |
-c                   | that has converged.  Swap the associated     |
-c                   | eigenvector of the tridiagonal matrix H as   |
-c                   | well.                                        |
-c                   %----------------------------------------------%
+c              %----------------------------------------------%
+c              | Swap the Ritz value on the left that has not |
+c              | converged with the Ritz value on the right   |
+c              | that has converged.  Swap the associated     |
+c              | eigenvector of the tridiagonal matrix H as   |
+c              | well.                                        |
+c              %----------------------------------------------%
 c
-                    temp = workl(ihd+leftptr-1)
-                    workl(ihd+leftptr-1) = workl(ihd+rghtptr-1)
-                    workl(ihd+rghtptr-1) = temp
-                    call dcopy (ncv, workl(iq+ncv*(leftptr-1)), 1,
-     &                         workl(iw), 1)
-                    call dcopy (ncv, workl(iq+ncv*(rghtptr-1)), 1,
-     &                          workl(iq+ncv*(leftptr-1)), 1)
-                    call dcopy (ncv, workl(iw), 1,
-     &                          workl(iq+ncv*(rghtptr-1)), 1)
-                    leftptr = leftptr + 1
-                    rghtptr = rghtptr - 1
-c
-                end if
-c
-                if (leftptr .lt. rghtptr) go to 20
+               temp = workl(ihd+leftptr-1)
+               workl(ihd+leftptr-1) = workl(ihd+rghtptr-1)
+               workl(ihd+rghtptr-1) = temp
+               call dcopy (ncv, workl(iq+ncv*(leftptr-1)), 1,
+     &                    workl(iw), 1)
+               call dcopy (ncv, workl(iq+ncv*(rghtptr-1)), 1,
+     &                    workl(iq+ncv*(leftptr-1)), 1)
+               call dcopy (ncv, workl(iw), 1,
+     &                    workl(iq+ncv*(rghtptr-1)), 1)
+               leftptr = leftptr + 1
+               rghtptr = rghtptr - 1
 c
             end if
-         end if
+c
+            if (leftptr .lt. rghtptr) go to 20
+c
+ 30      end if
 c
          if (msglvl .gt. 2) then
              call dvout  (logfil, ncv, workl(ihd), ndigit,
@@ -728,7 +727,7 @@ c        | the wanted invariant subspace located in the first NCONV |
 c        | columns of workl(iq,ldq).                                |
 c        %----------------------------------------------------------%
 c     
-         call dgeqr2 (ncv, nconv        , workl(iq) ,
+         call AR_DGEQR2 (ncv, nconv        , workl(iq) ,
      &                ldq, workl(iw+ncv), workl(ihb),
      &                ierr)
 c
@@ -740,11 +739,11 @@ c        | of the approximate invariant subspace associated with  |
 c        | the Ritz values in workl(ihd).                         |
 c        %--------------------------------------------------------%
 c     
-         call dorm2r ('Right', 'Notranspose', n        ,
+         call AR_DORM2R ('Right', 'Notranspose', n        ,
      &                ncv    , nconv        , workl(iq),
      &                ldq    , workl(iw+ncv), v        ,
      &                ldv    , workd(n+1)   , ierr)
-         call dlacpy ('All', n, nconv, v, ldv, z, ldz)
+         call AR_DLACPY ('All', n, nconv, v, ldv, z, ldz)
 c
 c        %-----------------------------------------------------%
 c        | In order to compute the Ritz estimates for the Ritz |
@@ -756,7 +755,7 @@ c
             workl(ihb+j-1) = zero 
   65     continue
          workl(ihb+ncv-1) = one
-         call dorm2r ('Left', 'Transpose'  , ncv       ,
+         call AR_DORM2R ('Left', 'Transpose'  , ncv       ,
      &                1     , nconv        , workl(iq) ,
      &                ldq   , workl(iw+ncv), workl(ihb),
      &                ncv   , temp         , ierr)

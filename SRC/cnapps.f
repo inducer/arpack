@@ -92,17 +92,17 @@ c     pp 357-385.
 c
 c\Routines called:
 c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
+c     second  ARPACK utility routine for timing.
 c     cmout   ARPACK utility routine that prints matrices
 c     cvout   ARPACK utility routine that prints vectors.
-c     clacpy  LAPACK matrix copy routine.
-c     clanhs  LAPACK routine that computes various norms of a matrix.
-c     clartg  LAPACK Givens rotation construction routine.
-c     claset  LAPACK matrix initialization routine.
-c     slabad  LAPACK routine for defining the underflow and overflow
+c     AR_CLACPY  LAPACK matrix copy routine.
+c     AR_CLANHS  LAPACK routine that computes various norms of a matrix.
+c     AR_CLARTG  LAPACK Givens rotation construction routine.
+c     AR_CLASET  LAPACK matrix initialization routine.
+c     AR_SLABAD  LAPACK routine for defining the underflow and overflow
 c             limits.
-c     slamch  LAPACK routine that determines machine constants.
-c     slapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
+c     AR_SLAMCH  LAPACK routine that determines machine constants.
+c     AR_SLAPY2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
 c     cgemv   Level 2 BLAS routine for matrix vector multiplication.
 c     caxpy   Level 1 BLAS that computes a vector triad.
 c     ccopy   Level 1 BLAS that copies one vector to another.
@@ -122,7 +122,7 @@ c
 c\Remarks
 c  1. In this version, each shift is applied to all the sublocks of
 c     the Hessenberg matrix H and not just to the submatrix that it
-c     comes from. Deflation as in LAPACK routine clahqr (QR algorithm
+c     comes from. Deflation as in LAPACK routine AR_CLAHQR (QR algorithm
 c     for upper Hessenberg matrices ) is used.
 c     Upon output, the subdiagonals of H are enforced to be non-negative
 c     real numbers.
@@ -183,16 +183,16 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   caxpy, ccopy, cgemv, cscal, clacpy, clartg, 
-     &           cvout, claset, slabad, cmout, arscnd, ivout
+      external   caxpy, ccopy, cgemv, cscal, AR_CLACPY, AR_CLARTG, 
+     &           cvout, AR_CLASET, AR_SLABAD, cmout, second, ivout
 c
 c     %--------------------%
 c     | External Functions |
 c     %--------------------%
 c
       Real                 
-     &           clanhs, slamch, slapy2
-      external   clanhs, slamch, slapy2
+     &           AR_CLANHS, AR_SLAMCH, AR_SLAPY2
+      external   AR_CLANHS, AR_SLAMCH, AR_SLAPY2
 c
 c     %----------------------%
 c     | Intrinsics Functions |
@@ -224,13 +224,13 @@ c        %-----------------------------------------------%
 c        | Set machine-dependent constants for the       |
 c        | stopping criterion. If norm(H) <= sqrt(OVFL), |
 c        | overflow should not occur.                    |
-c        | REFERENCE: LAPACK subroutine clahqr           |
+c        | REFERENCE: LAPACK subroutine AR_CLAHQR           |
 c        %-----------------------------------------------%
 c
-         unfl = slamch( 'safe minimum' )
+         unfl = AR_SLAMCH( 'safe minimum' )
          ovfl = real(one / unfl)
-         call slabad( unfl, ovfl )
-         ulp = slamch( 'precision' )
+         call AR_SLABAD( unfl, ovfl )
+         ulp = AR_SLAMCH( 'precision' )
          smlnum = unfl*( n / ulp )
          first = .false.
       end if
@@ -240,7 +240,7 @@ c     | Initialize timing statistics  |
 c     | & message level for debugging |
 c     %-------------------------------%
 c
-      call arscnd (t0)
+      call second (t0)
       msglvl = mcapps
 c 
       kplusp = kev + np 
@@ -250,7 +250,7 @@ c     | Initialize Q to the identity to accumulate |
 c     | the rotations and reflections              |
 c     %--------------------------------------------%
 c
-      call claset ('All', kplusp, kplusp, zero, one, q, ldq)
+      call AR_CLASET ('All', kplusp, kplusp, zero, one, q, ldq)
 c
 c     %----------------------------------------------%
 c     | Quick return if there are no shifts to apply |
@@ -282,12 +282,12 @@ c
 c           %----------------------------------------%
 c           | Check for splitting and deflation. Use |
 c           | a standard test as in the QR algorithm |
-c           | REFERENCE: LAPACK subroutine clahqr    |
+c           | REFERENCE: LAPACK subroutine AR_CLAHQR    |
 c           %----------------------------------------%
 c
             tst1 = cabs1( h( i, i ) ) + cabs1( h( i+1, i+1 ) )
             if( tst1.eq.rzero )
-     &         tst1 = clanhs( '1', kplusp-jj+1, h, ldh, workl )
+     &         tst1 = AR_CLANHS( '1', kplusp-jj+1, h, ldh, workl )
             if ( abs(real(h(i+1,i))) 
      &           .le. max(ulp*tst1, smlnum) )  then
                if (msglvl .gt. 0) then
@@ -332,7 +332,7 @@ c           %------------------------------------------------------%
 c           | Construct the plane rotation G to zero out the bulge |
 c           %------------------------------------------------------%
 c
-            call clartg (f, g, c, s, r)
+            call AR_CLARTG (f, g, c, s, r)
             if (i .gt. istart) then
                h(i,i-1) = r
                h(i+1,i-1) = zero
@@ -406,7 +406,7 @@ c
       do 120 j=1,kev
          if ( real( h(j+1,j) ) .lt. rzero .or.
      &        aimag( h(j+1,j) ) .ne. rzero ) then
-            t = h(j+1,j) / slapy2(real(h(j+1,j)),aimag(h(j+1,j)))
+            t = h(j+1,j) / AR_SLAPY2(real(h(j+1,j)),aimag(h(j+1,j)))
             call cscal( kplusp-j+1, conjg(t), h(j+1,j), ldh )
             call cscal( min(j+2, kplusp), t, h(1,j+1), 1 )
             call cscal( min(j+np+1,kplusp), t, q(1,j+1), 1 )
@@ -419,7 +419,7 @@ c
 c        %--------------------------------------------%
 c        | Final check for splitting and deflation.   |
 c        | Use a standard test as in the QR algorithm |
-c        | REFERENCE: LAPACK subroutine clahqr.       |
+c        | REFERENCE: LAPACK subroutine AR_CLAHQR.       |
 c        | Note: Since the subdiagonals of the        |
 c        | compressed H are nonnegative real numbers, |
 c        | we take advantage of this.                 |
@@ -427,7 +427,7 @@ c        %--------------------------------------------%
 c
          tst1 = cabs1( h( i, i ) ) + cabs1( h( i+1, i+1 ) )
          if( tst1 .eq. rzero )
-     &       tst1 = clanhs( '1', kev, h, ldh, workl )
+     &       tst1 = AR_CLANHS( '1', kev, h, ldh, workl )
          if( real( h( i+1,i ) ) .le. max( ulp*tst1, smlnum ) ) 
      &       h(i+1,i) = zero
  130  continue
@@ -459,7 +459,7 @@ c     %-------------------------------------------------%
 c     |  Move v(:,kplusp-kev+1:kplusp) into v(:,1:kev). |
 c     %-------------------------------------------------%
 c
-      call clacpy ('A', n, kev, v(1,kplusp-kev+1), ldv, v, ldv)
+      call AR_CLACPY ('A', n, kev, v(1,kplusp-kev+1), ldv, v, ldv)
 c 
 c     %--------------------------------------------------------------%
 c     | Copy the (kev+1)-st column of (V*Q) in the appropriate place |
@@ -495,7 +495,7 @@ c
       end if
 c
  9000 continue
-      call arscnd (t1)
+      call second (t1)
       tcapps = tcapps + (t1 - t0)
 c 
       return

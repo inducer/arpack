@@ -63,7 +63,7 @@ c
 c\Routines called:
 c     zsortc  ARPACK sorting routine.
 c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
+c     second  ARPACK utility routine for timing.
 c     zvout   ARPACK utility routine that prints vectors.
 c
 c\Author
@@ -126,7 +126,7 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   zvout,  zsortc, arscnd
+      external   zvout,  zsortc, second
 c
 c     %-----------------------%
 c     | Executable Statements |
@@ -137,7 +137,7 @@ c     | Initialize timing statistics  |
 c     | & message level for debugging |
 c     %-------------------------------%
 c 
-      call arscnd (t0)
+      call second (t0)
       msglvl = mcgets
 c 
       call zsortc (which, .true., kev+np, ritz, bounds)
@@ -157,7 +157,7 @@ c
 c
       end if
 c     
-      call arscnd (t1)
+      call second (t1)
       tcgets = tcgets + (t1 - t0)
 c
       if (msglvl .gt. 0) then

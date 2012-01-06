@@ -132,13 +132,13 @@ c
 c\Routines called:
 c     dgetv0  ARPACK routine to generate the initial vector.
 c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
+c     second  ARPACK utility routine for timing.
 c     dmout   ARPACK utility routine that prints matrices
 c     dvout   ARPACK utility routine that prints vectors.
-c     dlabad  LAPACK routine that computes machine constants.
-c     dlamch  LAPACK routine that determines machine constants.
-c     dlascl  LAPACK routine for careful scaling of a matrix.
-c     dlanhs  LAPACK routine that computes various norms of a matrix.
+c     AR_DLABAD  LAPACK routine that computes machine constants.
+c     AR_DLAMCH  LAPACK routine that determines machine constants.
+c     AR_DLASCL  LAPACK routine for careful scaling of a matrix.
+c     AR_DLANHS  LAPACK routine that computes various norms of a matrix.
 c     dgemv   Level 2 BLAS routine for matrix vector multiplication.
 c     daxpy   Level 1 BLAS that computes a vector triad.
 c     dscal   Level 1 BLAS that scales a vector.
@@ -267,16 +267,16 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   daxpy, dcopy, dscal, dgemv, dgetv0, dlabad, 
-     &           dvout, dmout, ivout, arscnd
+      external   daxpy, dcopy, dscal, dgemv, dgetv0, AR_DLABAD, 
+     &           dvout, dmout, ivout, second
 c
 c     %--------------------%
 c     | External Functions |
 c     %--------------------%
 c
       Double precision
-     &           ddot, dnrm2, dlanhs, dlamch
-      external   ddot, dnrm2, dlanhs, dlamch
+     &           ddot, dnrm2, AR_DLANHS, AR_DLAMCH
+      external   ddot, dnrm2, AR_DLANHS, AR_DLAMCH
 c
 c     %---------------------%
 c     | Intrinsic Functions |
@@ -301,13 +301,13 @@ c        | Set machine-dependent constants for the |
 c        | the splitting and deflation criterion.  |
 c        | If norm(H) <= sqrt(OVFL),               |
 c        | overflow should not occur.              |
-c        | REFERENCE: LAPACK subroutine dlahqr     |
+c        | REFERENCE: LAPACK subroutine AR_DLAHQR     |
 c        %-----------------------------------------%
 c
-         unfl = dlamch( 'safe minimum' )
+         unfl = AR_DLAMCH( 'safe minimum' )
          ovfl = one / unfl
-         call dlabad( unfl, ovfl )
-         ulp = dlamch( 'precision' )
+         call AR_DLABAD( unfl, ovfl )
+         ulp = AR_DLAMCH( 'precision' )
          smlnum = unfl*( n / ulp )
          first = .false.
       end if
@@ -319,7 +319,7 @@ c        | Initialize timing statistics  |
 c        | & message level for debugging |
 c        %-------------------------------%
 c
-         call arscnd (t0)
+         call second (t0)
          msglvl = mnaitr
 c 
 c        %------------------------------%
@@ -430,7 +430,7 @@ c              | which spans OP and exit.                       |
 c              %------------------------------------------------%
 c
                info = j - 1
-               call arscnd (t1)
+               call second (t1)
                tnaitr = tnaitr + (t1 - t0)
                ido = 99
                go to 9000
@@ -454,12 +454,12 @@ c
 c
 c            %-----------------------------------------%
 c            | To scale both v_{j} and p_{j} carefully |
-c            | use LAPACK routine SLASCL               |
+c            | use LAPACK routine AR_SLASCL               |
 c            %-----------------------------------------%
 c
-             call dlascl ('General', i, i, rnorm, one, n, 1, 
+             call AR_DLASCL ('General', i, i, rnorm, one, n, 1, 
      &                    v(1,j), n, infol)
-             call dlascl ('General', i, i, rnorm, one, n, 1, 
+             call AR_DLASCL ('General', i, i, rnorm, one, n, 1, 
      &                    workd(ipj), n, infol)
          end if
 c
@@ -470,7 +470,7 @@ c        %------------------------------------------------------%
 c
          step3 = .true.
          nopx  = nopx + 1
-         call arscnd (t2)
+         call second (t2)
          call dcopy (n, v(1,j), 1, workd(ivj), 1)
          ipntr(1) = ivj
          ipntr(2) = irj
@@ -490,7 +490,7 @@ c        | WORKD(IRJ:IRJ+N-1) := OP*v_{j}   |
 c        | if step3 = .true.                |
 c        %----------------------------------%
 c
-         call arscnd (t3)
+         call second (t3)
          tmvopx = tmvopx + (t3 - t2)
  
          step3 = .false.
@@ -506,7 +506,7 @@ c        | STEP 4:  Finish extending the Arnoldi |
 c        |          factorization to length j.   |
 c        %---------------------------------------%
 c
-         call arscnd (t2)
+         call second (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             step4 = .true.
@@ -531,7 +531,7 @@ c        | if step4 = .true.                |
 c        %----------------------------------%
 c
          if (bmat .eq. 'G') then
-            call arscnd (t3)
+            call second (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if
 c 
@@ -576,11 +576,11 @@ c
 c
          if (j .gt. 1) h(j,j-1) = betaj
 c
-         call arscnd (t4)
+         call second (t4)
 c 
          orth1 = .true.
 c
-         call arscnd (t2)
+         call second (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             call dcopy (n, resid, 1, workd(irj), 1)
@@ -604,7 +604,7 @@ c        | WORKD(IPJ:IPJ+N-1) := B*r_{j}.                    |
 c        %---------------------------------------------------%
 c
          if (bmat .eq. 'G') then
-            call arscnd (t3)
+            call second (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if
 c 
@@ -681,7 +681,7 @@ c
          call daxpy (j, one, workd(irj), 1, h(1,j), 1)
 c 
          orth2 = .true.
-         call arscnd (t2)
+         call second (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             call dcopy (n, resid, 1, workd(irj), 1)
@@ -705,7 +705,7 @@ c        | Back from reverse communication if ORTH2 = .true. |
 c        %---------------------------------------------------%
 c
          if (bmat .eq. 'G') then
-            call arscnd (t3)
+            call second (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if
 c
@@ -783,7 +783,7 @@ c
          rstart = .false.
          orth2  = .false.
 c 
-         call arscnd (t5)
+         call second (t5)
          titref = titref + (t5 - t4)
 c 
 c        %------------------------------------%
@@ -792,7 +792,7 @@ c        %------------------------------------%
 c
          j = j + 1
          if (j .gt. k+np) then
-            call arscnd (t1)
+            call second (t1)
             tnaitr = tnaitr + (t1 - t0)
             ido = 99
             do 110 i = max(1,k), k+np-1
@@ -800,12 +800,12 @@ c
 c              %--------------------------------------------%
 c              | Check for splitting and deflation.         |
 c              | Use a standard test as in the QR algorithm |
-c              | REFERENCE: LAPACK subroutine dlahqr        |
+c              | REFERENCE: LAPACK subroutine AR_DLAHQR        |
 c              %--------------------------------------------%
 c     
                tst1 = abs( h( i, i ) ) + abs( h( i+1, i+1 ) )
                if( tst1.eq.zero )
-     &              tst1 = dlanhs( '1', k+np, h, ldh, workd(n+1) )
+     &              tst1 = AR_DLANHS( '1', k+np, h, ldh, workd(n+1) )
                if( abs( h( i+1,i ) ).le.max( ulp*tst1, smlnum ) ) 
      &              h(i+1,i) = zero
  110        continue

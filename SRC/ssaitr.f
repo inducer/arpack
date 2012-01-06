@@ -133,8 +133,8 @@ c     sgetv0  ARPACK routine to generate the initial vector.
 c     ivout   ARPACK utility routine that prints integers.
 c     smout   ARPACK utility routine that prints matrices.
 c     svout   ARPACK utility routine that prints vectors.
-c     slamch  LAPACK routine that determines machine constants.
-c     slascl  LAPACK routine for careful scaling of a matrix.
+c     AR_SLAMCH  LAPACK routine that determines machine constants.
+c     AR_SLASCL  LAPACK routine for careful scaling of a matrix.
 c     sgemv   Level 2 BLAS routine for matrix vector multiplication.
 c     saxpy   Level 1 BLAS that computes a vector triad.
 c     sscal   Level 1 BLAS that scales a vector.
@@ -262,15 +262,15 @@ c     | External Subroutines |
 c     %----------------------%
 c
       external   saxpy, scopy, sscal, sgemv, sgetv0, svout, smout,
-     &           slascl, ivout, arscnd
+     &           AR_SLASCL, ivout, second
 c
 c     %--------------------%
 c     | External Functions |
 c     %--------------------%
 c
       Real
-     &           sdot, snrm2, slamch
-      external   sdot, snrm2, slamch
+     &           sdot, snrm2, AR_SLAMCH
+      external   sdot, snrm2, AR_SLAMCH
 c
 c     %-----------------%
 c     | Data statements |
@@ -290,7 +290,7 @@ c        | safmin = safe minimum is such  |
 c        | that 1/sfmin does not overflow |
 c        %--------------------------------%
 c
-         safmin = slamch('safmin')
+         safmin = AR_SLAMCH('safmin')
       end if
 c
       if (ido .eq. 0) then
@@ -300,7 +300,7 @@ c        | Initialize timing statistics  |
 c        | & message level for debugging |
 c        %-------------------------------%
 c
-         call arscnd (t0)
+         call second (t0)
          msglvl = msaitr
 c 
 c        %------------------------------%
@@ -420,7 +420,7 @@ c              | which spans OP and exit.                       |
 c              %------------------------------------------------%
 c
                info = j - 1
-               call arscnd (t1)
+               call second (t1)
                tsaitr = tsaitr + (t1 - t0)
                ido = 99
                go to 9000
@@ -444,12 +444,12 @@ c
 c
 c            %-----------------------------------------%
 c            | To scale both v_{j} and p_{j} carefully |
-c            | use LAPACK routine SLASCL               |
+c            | use LAPACK routine AR_SLASCL               |
 c            %-----------------------------------------%
 c
-             call slascl ('General', i, i, rnorm, one, n, 1, 
+             call AR_SLASCL ('General', i, i, rnorm, one, n, 1, 
      &                    v(1,j), n, infol)
-             call slascl ('General', i, i, rnorm, one, n, 1, 
+             call AR_SLASCL ('General', i, i, rnorm, one, n, 1, 
      &                    workd(ipj), n, infol)
          end if
 c 
@@ -460,7 +460,7 @@ c        %------------------------------------------------------%
 c
          step3 = .true.
          nopx  = nopx + 1
-         call arscnd (t2)
+         call second (t2)
          call scopy (n, v(1,j), 1, workd(ivj), 1)
          ipntr(1) = ivj
          ipntr(2) = irj
@@ -479,7 +479,7 @@ c        | Back from reverse communication;  |
 c        | WORKD(IRJ:IRJ+N-1) := OP*v_{j}.   |
 c        %-----------------------------------%
 c
-         call arscnd (t3)
+         call second (t3)
          tmvopx = tmvopx + (t3 - t2)
 c 
          step3 = .false.
@@ -500,7 +500,7 @@ c        | assumed to have A*v_{j}.                  |
 c        %-------------------------------------------%
 c
          if (mode .eq. 2) go to 65
-         call arscnd (t2)
+         call second (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             step4 = .true.
@@ -524,7 +524,7 @@ c        | WORKD(IPJ:IPJ+N-1) := B*OP*v_{j}. |
 c        %-----------------------------------%
 c
          if (bmat .eq. 'G') then
-            call arscnd (t3)
+            call second (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if 
 c
@@ -592,12 +592,12 @@ c
          else
             h(j,1) = rnorm
          end if
-         call arscnd (t4)
+         call second (t4)
 c 
          orth1 = .true.
          iter  = 0
 c 
-         call arscnd (t2)
+         call second (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             call scopy (n, resid, 1, workd(irj), 1)
@@ -621,7 +621,7 @@ c        | WORKD(IPJ:IPJ+N-1) := B*r_{j}.                    |
 c        %---------------------------------------------------%
 c
          if (bmat .eq. 'G') then
-            call arscnd (t3)
+            call second (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if
 c 
@@ -695,7 +695,7 @@ c
          h(j,2) = h(j,2) + workd(irj + j - 1)
 c 
          orth2 = .true.
-         call arscnd (t2)
+         call second (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             call scopy (n, resid, 1, workd(irj), 1)
@@ -719,7 +719,7 @@ c        | Back from reverse communication if ORTH2 = .true. |
 c        %---------------------------------------------------%
 c
          if (bmat .eq. 'G') then
-            call arscnd (t3)
+            call second (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if
 c
@@ -791,7 +791,7 @@ c
          rstart = .false.
          orth2  = .false.
 c 
-         call arscnd (t5)
+         call second (t5)
          titref = titref + (t5 - t4)
 c 
 c        %----------------------------------------------------------%
@@ -815,7 +815,7 @@ c        %------------------------------------%
 c
          j = j + 1
          if (j .gt. k+np) then
-            call arscnd (t1)
+            call second (t1)
             tsaitr = tsaitr + (t1 - t0)
             ido = 99
 c

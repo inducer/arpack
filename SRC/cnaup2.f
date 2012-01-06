@@ -135,12 +135,12 @@ c     cneigh  ARPACK compute Ritz values and error bounds routine.
 c     cngets  ARPACK reorder Ritz values and error bounds routine.
 c     csortc  ARPACK sorting routine.
 c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
+c     second  ARPACK utility routine for timing.
 c     cmout   ARPACK utility routine that prints matrices
 c     cvout   ARPACK utility routine that prints vectors.
 c     svout   ARPACK utility routine that prints vectors.
-c     slamch  LAPACK routine that determines machine constants.
-c     slapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
+c     AR_SLAMCH  LAPACK routine that determines machine constants.
+c     AR_SLAPY2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
 c     ccopy   Level 1 BLAS that copies one vector to another .
 c     cdotc   Level 1 BLAS that computes the scalar product of two vectors. 
 c     cswap   Level 1 BLAS that swaps two vectors.
@@ -240,7 +240,7 @@ c     | External Subroutines |
 c     %----------------------%
 c
       external   ccopy, cgetv0, cnaitr, cneigh, cngets, cnapps,
-     &           csortc, cswap, cmout, cvout, ivout, arscnd
+     &           csortc, cswap, cmout, cvout, ivout, second
 c
 c     %--------------------%
 c     | External functions |
@@ -249,8 +249,8 @@ c
       Complex 
      &           cdotc
       Real   
-     &           scnrm2, slamch, slapy2
-      external   cdotc, scnrm2, slamch, slapy2
+     &           scnrm2, AR_SLAMCH, AR_SLAPY2
+      external   cdotc, scnrm2, AR_SLAMCH, AR_SLAPY2
 c
 c     %---------------------%
 c     | Intrinsic Functions |
@@ -264,7 +264,7 @@ c     %-----------------------%
 c
       if (ido .eq. 0) then
 c 
-         call arscnd (t0)
+         call second (t0)
 c 
          msglvl = mcaup2
 c 
@@ -288,7 +288,7 @@ c        %---------------------------------%
 c        | Get machine dependent constant. |
 c        %---------------------------------%
 c
-         eps23 = slamch('Epsilon-Machine')
+         eps23 = AR_SLAMCH('Epsilon-Machine')
          eps23 = eps23**(2.0E+0  / 3.0E+0 )
 c
 c        %---------------------------------------%
@@ -488,9 +488,9 @@ c
          nconv  = 0
 c
          do 25 i = 1, nev
-            rtemp = max( eps23, slapy2( real (ritz(np+i)),
+            rtemp = max( eps23, AR_SLAPY2( real (ritz(np+i)),
      &                                  aimag(ritz(np+i)) ) ) 
-            if ( slapy2(real (bounds(np+i)),aimag(bounds(np+i))) 
+            if ( AR_SLAPY2(real (bounds(np+i)),aimag(bounds(np+i))) 
      &                 .le. tol*rtemp ) then
                nconv = nconv + 1
             end if
@@ -574,7 +574,7 @@ c           | by 1 / max(eps23, magnitude of the Ritz value).  |
 c           %--------------------------------------------------%
 c
             do 35 j = 1, nev0 
-                rtemp = max( eps23, slapy2( real (ritz(j)),
+                rtemp = max( eps23, AR_SLAPY2( real (ritz(j)),
      &                                       aimag(ritz(j)) ) )
                 bounds(j) = bounds(j)/rtemp
  35         continue
@@ -595,7 +595,7 @@ c           | value.                                       |
 c           %----------------------------------------------%
 c
             do 40 j = 1, nev0
-                rtemp = max( eps23, slapy2( real (ritz(j)),
+                rtemp = max( eps23, AR_SLAPY2( real (ritz(j)),
      &                                       aimag(ritz(j)) ) )
                 bounds(j) = bounds(j)*rtemp
  40         continue
@@ -724,7 +724,7 @@ c        | the first step of the next call to cnaitr.  |
 c        %---------------------------------------------%
 c
          cnorm = .true.
-         call arscnd (t2)
+         call second (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             call ccopy (n, resid, 1, workd(n+1), 1)
@@ -749,13 +749,13 @@ c        | WORKD(1:N) := B*RESID            |
 c        %----------------------------------%
 c
          if (bmat .eq. 'G') then
-            call arscnd (t3)
+            call second (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if
 c 
          if (bmat .eq. 'G') then         
             cmpnorm = cdotc (n, resid, 1, workd, 1)
-            rnorm = sqrt(slapy2(real (cmpnorm),aimag(cmpnorm)))
+            rnorm = sqrt(AR_SLAPY2(real (cmpnorm),aimag(cmpnorm)))
          else if (bmat .eq. 'I') then
             rnorm = scnrm2(n, resid, 1)
          end if
@@ -788,7 +788,7 @@ c     %------------%
 c     | Error Exit |
 c     %------------%
 c
-      call arscnd (t1)
+      call second (t1)
       tcaup2 = t1 - t0
 c     
  9000 continue

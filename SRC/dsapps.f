@@ -91,12 +91,12 @@ c     TR95-13, Department of Computational and Applied Mathematics.
 c
 c\Routines called:
 c     ivout   ARPACK utility routine that prints integers. 
-c     arscnd  ARPACK utility routine for timing.
+c     second  ARPACK utility routine for timing.
 c     dvout   ARPACK utility routine that prints vectors.
-c     dlamch  LAPACK routine that determines machine constants.
-c     dlartg  LAPACK Givens rotation construction routine.
-c     dlacpy  LAPACK matrix copy routine.
-c     dlaset  LAPACK matrix initialization routine.
+c     AR_DLAMCH  LAPACK routine that determines machine constants.
+c     AR_DLARTG  LAPACK Givens rotation construction routine.
+c     AR_DLACPY  LAPACK matrix copy routine.
+c     AR_DLASET  LAPACK matrix initialization routine.
 c     dgemv   Level 2 BLAS routine for matrix vector multiplication.
 c     daxpy   Level 1 BLAS that computes a vector triad.
 c     dcopy   Level 1 BLAS that copies one vector to another.
@@ -175,16 +175,16 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   daxpy, dcopy, dscal, dlacpy, dlartg, dlaset, dvout, 
-     &           ivout, arscnd, dgemv
+      external   daxpy, dcopy, dscal, AR_DLACPY, AR_DLARTG, AR_DLASET, dvout, 
+     &           ivout, second, dgemv
 c
 c     %--------------------%
 c     | External Functions |
 c     %--------------------%
 c
       Double precision
-     &           dlamch
-      external   dlamch
+     &           AR_DLAMCH
+      external   AR_DLAMCH
 c
 c     %----------------------%
 c     | Intrinsics Functions |
@@ -203,7 +203,7 @@ c     | Executable Statements |
 c     %-----------------------%
 c
       if (first) then
-         epsmch = dlamch('Epsilon-Machine')
+         epsmch = AR_DLAMCH('Epsilon-Machine')
          first = .false.
       end if
       itop = 1
@@ -213,7 +213,7 @@ c     | Initialize timing statistics  |
 c     | & message level for debugging |
 c     %-------------------------------%
 c
-      call arscnd (t0)
+      call second (t0)
       msglvl = msapps
 c 
       kplusp = kev + np 
@@ -223,7 +223,7 @@ c     | Initialize Q to the identity matrix of order |
 c     | kplusp used to accumulate the rotations.     |
 c     %----------------------------------------------%
 c
-      call dlaset ('All', kplusp, kplusp, zero, one, q, ldq)
+      call AR_DLASET ('All', kplusp, kplusp, zero, one, q, ldq)
 c
 c     %----------------------------------------------%
 c     | Quick return if there are no shifts to apply |
@@ -285,7 +285,7 @@ c           %--------------------------------------------------------%
 c
              f = h(istart,2) - shift(jj)
              g = h(istart+1,1)
-             call dlartg (f, g, c, s, r)
+             call AR_DLARTG (f, g, c, s, r)
 c 
 c            %-------------------------------------------------------%
 c            | Apply rotation to the left and right of H;            |
@@ -338,7 +338,7 @@ c               | Final update with G(i-1,i,theta) |
 c               %----------------------------------%
 c
                 h(i+1,1) = c*h(i+1,1)
-                call dlartg (f, g, c, s, r)
+                call AR_DLARTG (f, g, c, s, r)
 c
 c               %-------------------------------------------%
 c               | The following ensures that h(1:iend-1,1), |
@@ -468,7 +468,7 @@ c     %-------------------------------------------------%
 c     |  Move v(:,kplusp-kev+1:kplusp) into v(:,1:kev). |
 c     %-------------------------------------------------%
 c
-      call dlacpy ('All', n, kev, v(1,np+1), ldv, v, ldv)
+      call AR_DLACPY ('All', n, kev, v(1,np+1), ldv, v, ldv)
 c 
 c     %--------------------------------------------%
 c     | Copy the (kev+1)-st column of (V*Q) in the |
@@ -503,7 +503,7 @@ c
          end if
       end if
 c
-      call arscnd (t1)
+      call second (t1)
       tsapps = tsapps + (t1 - t0)
 c 
  9000 continue 

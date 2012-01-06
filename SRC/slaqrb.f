@@ -8,7 +8,7 @@ c  Compute the eigenvalues and the Schur decomposition of an upper
 c  Hessenberg submatrix in rows and columns ILO to IHI.  Only the
 c  last component of the Schur vectors are computed.
 c
-c  This is mostly a modification of the LAPACK routine slahqr.
+c  This is mostly a modification of the LAPACK routine AR_SLAHQR.
 c  
 c\Usage:
 c  call slaqrb
@@ -75,12 +75,12 @@ c\Local variables:
 c     xxxxxx  real
 c
 c\Routines called:
-c     slabad  LAPACK routine that computes machine constants.
-c     slamch  LAPACK routine that determines machine constants.
-c     slanhs  LAPACK routine that computes various norms of a matrix.
-c     slanv2  LAPACK routine that computes the Schur factorization of
+c     AR_SLABAD  LAPACK routine that computes machine constants.
+c     AR_SLAMCH  LAPACK routine that determines machine constants.
+c     AR_SLANHS  LAPACK routine that computes various norms of a matrix.
+c     AR_SLANV2  LAPACK routine that computes the Schur factorization of
 c             2 by 2 nonsymmetric matrix in standard form.
-c     slarfg  LAPACK Householder reflection construction routine.
+c     AR_SLARFG  LAPACK Householder reflection construction routine.
 c     scopy   Level 1 BLAS that copies one vector to another.
 c     srot    Level 1 BLAS that applies a rotation to a 2 by 2 matrix.
 
@@ -95,7 +95,7 @@ c     Houston, Texas
 c
 c\Revision history:
 c     xx/xx/92: Version ' 2.4'
-c               Modified from the LAPACK routine slahqr so that only the
+c               Modified from the LAPACK routine AR_SLAHQR so that only the
 c               last component of the Schur vectors are computed.
 c
 c\SCCS Information: @(#) 
@@ -151,14 +151,14 @@ c     | External Functions |
 c     %--------------------%
 c
       Real
-     &           slamch, slanhs
-      external   slamch, slanhs
+     &           AR_SLAMCH, AR_SLANHS
+      external   AR_SLAMCH, AR_SLANHS
 c
 c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   scopy, slabad, slanv2, slarfg, srot
+      external   scopy, AR_SLABAD, AR_SLANV2, AR_SLARFG, srot
 c
 c     %-----------------------%
 c     | Executable Statements |
@@ -195,10 +195,10 @@ c     | Set machine-dependent constants for the stopping criterion. |
 c     | If norm(H) <= sqrt(OVFL), overflow should not occur.        |
 c     %-------------------------------------------------------------%
 c
-      unfl = slamch( 'safe minimum' )
+      unfl = AR_SLAMCH( 'safe minimum' )
       ovfl = one / unfl
-      call slabad( unfl, ovfl )
-      ulp = slamch( 'precision' )
+      call AR_SLABAD( unfl, ovfl )
+      ulp = AR_SLAMCH( 'precision' )
       smlnum = unfl*( nh / ulp )
 c
 c     %---------------------------------------------------------------%
@@ -256,7 +256,7 @@ c
          do 20 k = i, l + 1, -1
             tst1 = abs( h( k-1, k-1 ) ) + abs( h( k, k ) )
             if( tst1.eq.zero )
-     &         tst1 = slanhs( '1', i-l+1, h( l, l ), ldh, work )
+     &         tst1 = AR_SLANHS( '1', i-l+1, h( l, l ), ldh, work )
             if( abs( h( k, k-1 ) ).le.max( ulp*tst1, smlnum ) )
      &         go to 30
    20    continue
@@ -369,7 +369,7 @@ c
             nr = min( 3, i-k+1 )
             if( k.gt.m )
      &         call scopy( nr, h( k, k-1 ), 1, v, 1 )
-            call slarfg( nr, v( 1 ), v( 2 ), 1, t1 )
+            call AR_SLARFG( nr, v( 1 ), v( 2 ), 1, t1 )
             if( k.gt.m ) then
                h( k, k-1 ) = v( 1 )
                h( k+1, k-1 ) = zero
@@ -481,7 +481,7 @@ c        | Transform the 2-by-2 submatrix to standard Schur form, |
 c        | and compute and store the eigenvalues.                 |
 c        %--------------------------------------------------------%
 c
-         call slanv2( h( i-1, i-1 ), h( i-1, i ), h( i, i-1 ),
+         call AR_SLANV2( h( i-1, i-1 ), h( i-1, i ), h( i, i-1 ),
      &                h( i, i ), wr( i-1 ), wi( i-1 ), wr( i ), wi( i ),
      &                cs, sn )
  

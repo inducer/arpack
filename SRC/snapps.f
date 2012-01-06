@@ -97,19 +97,19 @@ c     pp 357-385.
 c
 c\Routines called:
 c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
+c     second  ARPACK utility routine for timing.
 c     smout   ARPACK utility routine that prints matrices.
 c     svout   ARPACK utility routine that prints vectors.
-c     slabad  LAPACK routine that computes machine constants.
-c     slacpy  LAPACK matrix copy routine.
-c     slamch  LAPACK routine that determines machine constants. 
-c     slanhs  LAPACK routine that computes various norms of a matrix.
-c     slapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
-c     slarf   LAPACK routine that applies Householder reflection to
+c     AR_SLABAD  LAPACK routine that computes machine constants.
+c     AR_SLACPY  LAPACK matrix copy routine.
+c     AR_SLAMCH  LAPACK routine that determines machine constants. 
+c     AR_SLANHS  LAPACK routine that computes various norms of a matrix.
+c     AR_SLAPY2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
+c     AR_SLARF   LAPACK routine that applies Householder reflection to
 c             a matrix.
-c     slarfg  LAPACK Householder reflection construction routine.
-c     slartg  LAPACK Givens rotation construction routine.
-c     slaset  LAPACK matrix initialization routine.
+c     AR_SLARFG  LAPACK Householder reflection construction routine.
+c     AR_SLARTG  LAPACK Givens rotation construction routine.
+c     AR_SLASET  LAPACK matrix initialization routine.
 c     sgemv   Level 2 BLAS routine for matrix vector multiplication.
 c     saxpy   Level 1 BLAS that computes a vector triad.
 c     scopy   Level 1 BLAS that copies one vector to another .
@@ -132,7 +132,7 @@ c
 c\Remarks
 c  1. In this version, each shift is applied to all the sublocks of
 c     the Hessenberg matrix H and not just to the submatrix that it
-c     comes from. Deflation as in LAPACK routine slahqr (QR algorithm
+c     comes from. Deflation as in LAPACK routine AR_SLAHQR (QR algorithm
 c     for upper Hessenberg matrices ) is used.
 c     The subdiagonals of H are enforced to be non-negative.
 c
@@ -188,16 +188,16 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   saxpy, scopy, sscal, slacpy, slarfg, slarf,
-     &           slaset, slabad, arscnd, slartg
+      external   saxpy, scopy, sscal, AR_SLACPY, AR_SLARFG, AR_SLARF,
+     &           AR_SLASET, AR_SLABAD, second, AR_SLARTG
 c
 c     %--------------------%
 c     | External Functions |
 c     %--------------------%
 c
       Real
-     &           slamch, slanhs, slapy2
-      external   slamch, slanhs, slapy2
+     &           AR_SLAMCH, AR_SLANHS, AR_SLAPY2
+      external   AR_SLAMCH, AR_SLANHS, AR_SLAPY2
 c
 c     %----------------------%
 c     | Intrinsics Functions |
@@ -221,13 +221,13 @@ c        %-----------------------------------------------%
 c        | Set machine-dependent constants for the       |
 c        | stopping criterion. If norm(H) <= sqrt(OVFL), |
 c        | overflow should not occur.                    |
-c        | REFERENCE: LAPACK subroutine slahqr           |
+c        | REFERENCE: LAPACK subroutine AR_SLAHQR           |
 c        %-----------------------------------------------%
 c
-         unfl = slamch( 'safe minimum' )
+         unfl = AR_SLAMCH( 'safe minimum' )
          ovfl = one / unfl
-         call slabad( unfl, ovfl )
-         ulp = slamch( 'precision' )
+         call AR_SLABAD( unfl, ovfl )
+         ulp = AR_SLAMCH( 'precision' )
          smlnum = unfl*( n / ulp )
          first = .false.
       end if
@@ -237,7 +237,7 @@ c     | Initialize timing statistics  |
 c     | & message level for debugging |
 c     %-------------------------------%
 c
-      call arscnd (t0)
+      call second (t0)
       msglvl = mnapps
       kplusp = kev + np 
 c 
@@ -246,7 +246,7 @@ c     | Initialize Q to the identity to accumulate |
 c     | the rotations and reflections              |
 c     %--------------------------------------------%
 c
-      call slaset ('All', kplusp, kplusp, zero, one, q, ldq)
+      call AR_SLASET ('All', kplusp, kplusp, zero, one, q, ldq)
 c
 c     %----------------------------------------------%
 c     | Quick return if there are no shifts to apply |
@@ -327,12 +327,12 @@ c
 c           %----------------------------------------%
 c           | Check for splitting and deflation. Use |
 c           | a standard test as in the QR algorithm |
-c           | REFERENCE: LAPACK subroutine slahqr    |
+c           | REFERENCE: LAPACK subroutine AR_SLAHQR    |
 c           %----------------------------------------%
 c
             tst1 = abs( h( i, i ) ) + abs( h( i+1, i+1 ) )
             if( tst1.eq.zero )
-     &         tst1 = slanhs( '1', kplusp-jj+1, h, ldh, workl )
+     &         tst1 = AR_SLANHS( '1', kplusp-jj+1, h, ldh, workl )
             if( abs( h( i+1,i ) ).le.max( ulp*tst1, smlnum ) ) then
                if (msglvl .gt. 0) then
                   call ivout (logfil, 1, i, ndigit, 
@@ -388,7 +388,7 @@ c              %-----------------------------------------------------%
 c              | Contruct the plane rotation G to zero out the bulge |
 c              %-----------------------------------------------------%
 c
-               call slartg (f, g, c, s, r)
+               call AR_SLARTG (f, g, c, s, r)
                if (i .gt. istart) then
 c
 c                 %-------------------------------------------%
@@ -465,7 +465,7 @@ c           | Compute 1st column of (H - shift*I)*(H - conj(shift)*I) |
 c           %---------------------------------------------------------%
 c
             s    = 2.0*sigmar
-            t = slapy2 ( sigmar, sigmai ) 
+            t = AR_SLAPY2 ( sigmar, sigmai ) 
             u(1) = ( h11 * (h11 - s) + t * t ) / h21 + h12
             u(2) = h11 + h22 - s 
             u(3) = h32
@@ -479,7 +479,7 @@ c              | Construct Householder reflector G to zero out u(1). |
 c              | G is of the form I - tau*( 1 u )' * ( 1 u' ).       |
 c              %-----------------------------------------------------%
 c
-               call slarfg ( nr, u(1), u(2), 1, tau )
+               call AR_SLARFG ( nr, u(1), u(2), 1, tau )
 c
                if (i .gt. istart) then
                   h(i,i-1)   = u(1)
@@ -492,7 +492,7 @@ c              %--------------------------------------%
 c              | Apply the reflector to the left of H |
 c              %--------------------------------------%
 c
-               call slarf ('Left', nr, kplusp-i+1, u, 1, tau,
+               call AR_SLARF ('Left', nr, kplusp-i+1, u, 1, tau,
      &                     h(i,i), ldh, workl)
 c
 c              %---------------------------------------%
@@ -500,14 +500,14 @@ c              | Apply the reflector to the right of H |
 c              %---------------------------------------%
 c
                ir = min ( i+3, iend )
-               call slarf ('Right', ir, nr, u, 1, tau,
+               call AR_SLARF ('Right', ir, nr, u, 1, tau,
      &                     h(1,i), ldh, workl)
 c
 c              %-----------------------------------------------------%
 c              | Accumulate the reflector in the matrix Q;  Q <- Q*G |
 c              %-----------------------------------------------------%
 c
-               call slarf ('Right', kplusp, nr, u, 1, tau, 
+               call AR_SLARF ('Right', kplusp, nr, u, 1, tau, 
      &                     q(1,i), ldq, workl)
 c
 c              %----------------------------%
@@ -562,12 +562,12 @@ c
 c        %--------------------------------------------%
 c        | Final check for splitting and deflation.   |
 c        | Use a standard test as in the QR algorithm |
-c        | REFERENCE: LAPACK subroutine slahqr        |
+c        | REFERENCE: LAPACK subroutine AR_SLAHQR        |
 c        %--------------------------------------------%
 c
          tst1 = abs( h( i, i ) ) + abs( h( i+1, i+1 ) )
          if( tst1.eq.zero )
-     &       tst1 = slanhs( '1', kev, h, ldh, workl )
+     &       tst1 = AR_SLANHS( '1', kev, h, ldh, workl )
          if( h( i+1,i ) .le. max( ulp*tst1, smlnum ) ) 
      &       h(i+1,i) = zero
  130  continue
@@ -599,7 +599,7 @@ c     %-------------------------------------------------%
 c     |  Move v(:,kplusp-kev+1:kplusp) into v(:,1:kev). |
 c     %-------------------------------------------------%
 c
-      call slacpy ('A', n, kev, v(1,kplusp-kev+1), ldv, v, ldv)
+      call AR_SLACPY ('A', n, kev, v(1,kplusp-kev+1), ldv, v, ldv)
 c 
 c     %--------------------------------------------------------------%
 c     | Copy the (kev+1)-st column of (V*Q) in the appropriate place |
@@ -635,7 +635,7 @@ c
       end if
 c 
  9000 continue
-      call arscnd (t1)
+      call second (t1)
       tnapps = tnapps + (t1 - t0)
 c 
       return

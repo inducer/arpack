@@ -181,8 +181,8 @@ c          Error flag on output.
 c
 c          =  0: Normal exit.
 c
-c          =  1: The Schur form computed by LAPACK routine slahqr
-c                could not be reordered by LAPACK routine strsen.
+c          =  1: The Schur form computed by LAPACK routine AR_SLAHQR
+c                could not be reordered by LAPACK routine AR_STRSEN.
 c                Re-enter subroutine sneupd with IPARAM(5)=NCV and 
 c                increase the size of the arrays DR and DI to have 
 c                dimension at least dimension NCV and allocate at least NCV 
@@ -197,9 +197,9 @@ c          = -5: WHICH must be one of 'LM', 'SM', 'LR', 'SR', 'LI', 'SI'
 c          = -6: BMAT must be one of 'I' or 'G'.
 c          = -7: Length of private work WORKL array is not sufficient.
 c          = -8: Error return from calculation of a real Schur form.
-c                Informational error from LAPACK routine slahqr.
+c                Informational error from LAPACK routine AR_SLAHQR.
 c          = -9: Error return from calculation of eigenvectors.
-c                Informational error from LAPACK routine strevc.
+c                Informational error from LAPACK routine AR_STREVC.
 c          = -10: IPARAM(7) must be 1,2,3,4.
 c          = -11: IPARAM(7) = 1 and BMAT = 'G' are incompatible.
 c          = -12: HOWMNY = 'S' not yet implemented
@@ -229,19 +229,19 @@ c\Routines called:
 c     ivout   ARPACK utility routine that prints integers.
 c     smout   ARPACK utility routine that prints matrices
 c     svout   ARPACK utility routine that prints vectors.
-c     sgeqr2  LAPACK routine that computes the QR factorization of 
+c     AR_SGEQR2  LAPACK routine that computes the QR factorization of 
 c             a matrix.
-c     slacpy  LAPACK matrix copy routine.
-c     slahqr  LAPACK routine to compute the real Schur form of an
+c     AR_SLACPY  LAPACK matrix copy routine.
+c     AR_SLAHQR  LAPACK routine to compute the real Schur form of an
 c             upper Hessenberg matrix.
-c     slamch  LAPACK routine that determines machine constants.
-c     slapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
-c     slaset  LAPACK matrix initialization routine.
-c     sorm2r  LAPACK routine that applies an orthogonal matrix in 
+c     AR_SLAMCH  LAPACK routine that determines machine constants.
+c     AR_SLAPY2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
+c     AR_SLASET  LAPACK matrix initialization routine.
+c     AR_SORM2R  LAPACK routine that applies an orthogonal matrix in 
 c             factored form.
-c     strevc  LAPACK routine to compute the eigenvectors of a matrix
+c     AR_STREVC  LAPACK routine to compute the eigenvectors of a matrix
 c             in upper quasi-triangular form.
-c     strsen  LAPACK routine that re-orders the Schur form.
+c     AR_STRSEN  LAPACK routine that re-orders the Schur form.
 c     strmm   Level 3 BLAS matrix times an upper triangular matrix.
 c     sger    Level 2 BLAS rank one update to a matrix.
 c     scopy   Level 1 BLAS that copies one vector to another .
@@ -353,7 +353,7 @@ c
      &           mode  , msglvl, outncv, ritzr   ,
      &           ritzi , wri   , wrr   , irr     ,
      &           iri   , ibd   , ishift, numcnv  ,
-     &           np    , jj    , nconv2
+     &           np    , jj 
       logical    reord
       Real 
      &           conds  , rnorm, sep  , temp,
@@ -363,9 +363,9 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   scopy , sger  , sgeqr2, slacpy, 
-     &           slahqr, slaset, smout , sorm2r, 
-     &           strevc, strmm , strsen, sscal , 
+      external   scopy , sger  , AR_SGEQR2, AR_SLACPY, 
+     &           AR_SLAHQR, AR_SLASET, smout , AR_SORM2R, 
+     &           AR_STREVC, strmm , AR_STRSEN, sscal , 
      &           svout , ivout
 c
 c     %--------------------%
@@ -373,8 +373,8 @@ c     | External Functions |
 c     %--------------------%
 c
       Real 
-     &           slapy2, snrm2, slamch, sdot
-      external   slapy2, snrm2, slamch, sdot
+     &           AR_SLAPY2, snrm2, AR_SLAMCH, sdot
+      external   AR_SLAPY2, snrm2, AR_SLAMCH, sdot
 c
 c     %---------------------%
 c     | Intrinsic Functions |
@@ -399,7 +399,7 @@ c     %---------------------------------%
 c     | Get machine dependent constant. |
 c     %---------------------------------%
 c
-      eps23 = slamch('Epsilon-Machine')
+      eps23 = AR_SLAMCH('Epsilon-Machine')
       eps23 = eps23**(2.0E+0  / 3.0E+0 )
 c
 c     %--------------%
@@ -583,7 +583,7 @@ c
          numcnv = 0
          do 11 j = 1,ncv
             temp1 = max(eps23,
-     &                 slapy2( workl(irr+ncv-j), workl(iri+ncv-j) ))
+     &                 AR_SLAPY2( workl(irr+ncv-j), workl(iri+ncv-j) ))
             jj = workl(bounds + ncv - j)
             if (numcnv .lt. nconv .and.
      &          workl(ibd+jj-1) .le. tol*temp1) then
@@ -613,17 +613,17 @@ c
          end if
 c
 c        %-----------------------------------------------------------%
-c        | Call LAPACK routine slahqr to compute the real Schur form |
+c        | Call LAPACK routine AR_SLAHQR to compute the real Schur form |
 c        | of the upper Hessenberg matrix returned by SNAUPD.        |
 c        | Make a copy of the upper Hessenberg matrix.               |
 c        | Initialize the Schur vector matrix Q to the identity.     |
 c        %-----------------------------------------------------------%
 c     
          call scopy(ldh*ncv, workl(ih), 1, workl(iuptri), 1)
-         call slaset('All', ncv, ncv, 
+         call AR_SLASET('All', ncv, ncv, 
      &                zero , one, workl(invsub),
      &                ldq)
-         call slahqr(.true., .true.       , ncv, 
+         call AR_SLAHQR(.true., .true.       , ncv, 
      &                1     , ncv          , workl(iuptri), 
      &                ldh   , workl(iheigr), workl(iheigi),
      &                1     , ncv          , workl(invsub), 
@@ -656,20 +656,16 @@ c           %-----------------------------------------------------%
 c           | Reorder the computed upper quasi-triangular matrix. | 
 c           %-----------------------------------------------------%
 c     
-            call strsen('None'       , 'V'          , 
+            call AR_STRSEN('None'       , 'V'          , 
      &                   select       , ncv          ,
      &                   workl(iuptri), ldh          , 
      &                   workl(invsub), ldq          , 
      &                   workl(iheigr), workl(iheigi), 
-     &                   nconv2       , conds        ,
+     &                   nconv        , conds        ,
      &                   sep          , workl(ihbds) , 
      &                   ncv          , iwork        ,
      &                   1            , ierr)
 c
-            if (nconv2 .lt. nconv) then
-               nconv = nconv2
-            end if
-
             if (ierr .eq. 1) then
                info = 1
                go to 9000
@@ -714,12 +710,12 @@ c        | the wanted invariant subspace located in the first NCONV |
 c        | columns of workl(invsub,ldq).                            |
 c        %----------------------------------------------------------%
 c     
-         call sgeqr2(ncv, nconv , workl(invsub), 
+         call AR_SGEQR2(ncv, nconv , workl(invsub), 
      &               ldq, workev, workev(ncv+1),
      &               ierr)
 c
 c        %---------------------------------------------------------%
-c        | * Postmultiply V by Q using sorm2r.                     |   
+c        | * Postmultiply V by Q using AR_SORM2R.                     |   
 c        | * Copy the first NCONV columns of VQ into Z.            |
 c        | * Postmultiply Z by R.                                  |
 c        | The N by NCONV matrix Z is now a matrix representation  |
@@ -730,11 +726,11 @@ c        | vectors associated with the real upper quasi-triangular |
 c        | matrix of order NCONV in workl(iuptri)                  |
 c        %---------------------------------------------------------%
 c     
-         call sorm2r('Right', 'Notranspose', n            , 
+         call AR_SORM2R('Right', 'Notranspose', n            , 
      &                ncv   , nconv        , workl(invsub),
      &                ldq   , workev       , v            , 
      &                ldv   , workd(n+1)   , ierr)
-         call slacpy('All', n, nconv, v, ldv, z, ldz)
+         call AR_SLACPY('All', n, nconv, v, ldv, z, ldz)
 c
          do 20 j=1, nconv
 c     
@@ -769,7 +765,7 @@ c
                end if
  30         continue
 c
-            call strevc('Right', 'Select'     , select       , 
+            call AR_STREVC('Right', 'Select'     , select       , 
      &                   ncv    , workl(iuptri), ldq          , 
      &                   vl     , 1            , workl(invsub),
      &                   ldq    , ncv          , outncv       ,
@@ -783,7 +779,7 @@ c
 c           %------------------------------------------------%
 c           | Scale the returning eigenvectors so that their |
 c           | Euclidean norms are all one. LAPACK subroutine |
-c           | strevc returns each eigenvector normalized so  |
+c           | AR_STREVC returns each eigenvector normalized so  |
 c           | that the element of largest magnitude has      |
 c           | magnitude 1;                                   |
 c           %------------------------------------------------%
@@ -812,7 +808,7 @@ c                 | square root of two.                       |
 c                 %-------------------------------------------%
 c
                   if (iconj .eq. 0) then
-                     temp = slapy2(snrm2(ncv, 
+                     temp = AR_SLAPY2(snrm2(ncv, 
      &                                   workl(invsub+(j-1)*ldq), 
      &                                   1),
      &                             snrm2(ncv, 
@@ -845,7 +841,7 @@ c                 | the eigenvector are stored in consecutive |
 c                 %-------------------------------------------%
 c
                   if (iconj .eq. 0) then
-                     workev(j) = slapy2(workev(j), workev(j+1))
+                     workev(j) = AR_SLAPY2(workev(j), workev(j+1))
                      workev(j+1) = workev(j)
                      iconj = 1
                   else
@@ -877,7 +873,7 @@ c           | associated with leading portion of T in the first NCONV |
 c           | columns of workl(invsub,ldq).                           |
 c           %---------------------------------------------------------%
 c     
-            call sgeqr2(ncv, nconv , workl(invsub), 
+            call AR_SGEQR2(ncv, nconv , workl(invsub), 
      &                   ldq, workev, workev(ncv+1),
      &                   ierr)
 c     
@@ -889,7 +885,7 @@ c           | Ritz vectors associated with the Ritz values |
 c           | in workl(iheigr) and workl(iheigi).          |
 c           %----------------------------------------------%
 c     
-            call sorm2r('Right', 'Notranspose', n            ,
+            call AR_SORM2R('Right', 'Notranspose', n            ,
      &                   ncv  , nconv        , workl(invsub),
      &                   ldq  , workev       , z            ,
      &                   ldz  , workd(n+1)   , ierr)
@@ -940,7 +936,7 @@ c
      &         call sscal(ncv, rnorm, workl(ihbds), 1)
 c
             do 50 k=1, ncv
-               temp = slapy2( workl(iheigr+k-1), 
+               temp = AR_SLAPY2( workl(iheigr+k-1), 
      &                        workl(iheigi+k-1) )
                workl(ihbds+k-1) = abs( workl(ihbds+k-1) ) 
      &                          / temp / temp
@@ -971,7 +967,7 @@ c
          if (type .eq. 'SHIFTI') then 
 c
             do 80 k=1, ncv
-               temp = slapy2( workl(iheigr+k-1), 
+               temp = AR_SLAPY2( workl(iheigr+k-1), 
      &                        workl(iheigi+k-1) )
                workl(iheigr+k-1) = workl(iheigr+k-1)/temp/temp 
      &                           + sigmar   
@@ -1032,7 +1028,7 @@ c
                workev(j) =  workl(invsub+(j-1)*ldq+ncv-1) /
      &                      workl(iheigr+j-1)
             else if (iconj .eq. 0) then
-               temp = slapy2( workl(iheigr+j-1), workl(iheigi+j-1) )
+               temp = AR_SLAPY2( workl(iheigr+j-1), workl(iheigi+j-1) )
                workev(j) = ( workl(invsub+(j-1)*ldq+ncv-1) * 
      &                       workl(iheigr+j-1) +
      &                       workl(invsub+j*ldq+ncv-1) * 
