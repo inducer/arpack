@@ -43,7 +43,7 @@ The original README follows below.
 
       ssaupd, dsaupd - symmetric single and double precision
       snaupd, dnaupd - non-symmetric single and double precision
-      cnaupd, cnaupd - complex non-symmetric single and double precision
+      cnaupd, znaupd - complex non-symmetric single and double precision
 
    The headers of these routines contain full documentation of calling
    sequence and usage.  Additional information is in the DOCUMENTS directory.
