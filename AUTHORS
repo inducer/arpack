@@ -1,7 +1,26 @@
 Rich Lehoucq
 Kristi Maschhoff
 Danny Sorensen
-Chao Yang 
+Chao Yang
 
-Autotoolized and distributed by
+Modifications by (in alphabetical order):
+
+David Bateman
+  (via https://bugs.launchpad.net/ubuntu/+source/arpack/+bug/485781)
+  Fix improper bound on the # of eigenvalues/eigenvectors
+    requested from the xTRSEN function.
+
 Andreas Kloeckner <inform@tiker.net>
+  Autotools integration
+  Distribution/packaging
+  Nconv/nev bug fix
+  Arscnd naming bug fix
+
+Tim Mitchell <tim.mitchell@cims.nyu.edu>
+
+  Fix "ARPACK can return the wrong eigenvalues if
+  eigenvectors are requested and the resulting number of
+  converged eigenvalues is less than the number requested."
+
+Brendan O'Connor
+  Autotools fixes.

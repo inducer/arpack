@@ -1,3 +1,14 @@
+-------------------------------------------------------------------------------
+This is a modified version of ARPACK that includes many bug fixes
+and may be built using GNU autotools. See
+http://mathema.tician.de/software/arpack
+for more information.
+
+The original README follows below.
+
+- Andreas Kloeckner <inform@tiker.net>
+-------------------------------------------------------------------------------
+
 1. You have successfully unbundled ARPACK and are now in the ARPACK 
    directory that was created for you.
 
