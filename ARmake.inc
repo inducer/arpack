@@ -1,5 +1,8 @@
 #
-# NOTE: This file is useful for compiling the examples.
+# NOTE: This file is ONLY useful for compiling the examples, and that's
+# the only reason it's still in the package. Everything else is built
+# with automake. If you'd like to convert the examples to automake, please
+# submit a patch. Thanks, Andreas
 #
 ###########################################################################
 #

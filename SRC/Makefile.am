@@ -78,3 +78,6 @@ libarpack_la_SOURCES = \
 	../LAPACK/zlaswp.f ../LAPACK/zlatrs.f ../LAPACK/zmach.f		\
 	../LAPACK/zrot.f ../LAPACK/ztrevc.f ../LAPACK/ztrexc.f		\
 	../LAPACK/ztrsen.f ../LAPACK/ztrsyl.f ../LAPACK/zunm2r.f
+
+libarpack_la_FFLAGS=@FFLAGS@
+libarpack_la_LDFLAGS=@BLAS_LIBS@
