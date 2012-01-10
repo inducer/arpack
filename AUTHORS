@@ -24,3 +24,6 @@ Tim Mitchell <tim.mitchell@cims.nyu.edu>
 
 Brendan O'Connor
   Autotools fixes.
+
+Viral B. Shah
+  Reintegrate LAPACK2, rename to avoid conflict with LAPACK3.
