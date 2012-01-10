@@ -131,15 +131,15 @@ c
 c\Routines called:
 c     zgetv0  ARPACK routine to generate the initial vector.
 c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
+c     ARSCND  ARPACK utility routine for timing.
 c     zmout   ARPACK utility routine that prints matrices
 c     zvout   ARPACK utility routine that prints vectors.
-c     zlanhs  LAPACK routine that computes various norms of a matrix.
-c     zlascl  LAPACK routine for careful scaling of a matrix.
-c     dlabad  LAPACK routine for defining the underflow and overflow
+c     AR_ZLANHS  LAPACK routine that computes various norms of a matrix.
+c     AR_ZLASCL  LAPACK routine for careful scaling of a matrix.
+c     AR_DLABAD  LAPACK routine for defining the underflow and overflow
 c             limits.
-c     dlamch  LAPACK routine that determines machine constants.
-c     dlapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
+c     AR_DLAMCH  LAPACK routine that determines machine constants.
+c     AR_DLAPY2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
 c     zgemv   Level 2 BLAS routine for matrix vector multiplication.
 c     zaxpy   Level 1 BLAS that computes a vector triad.
 c     zcopy   Level 1 BLAS that copies one vector to another .
@@ -273,7 +273,7 @@ c     | External Subroutines |
 c     %----------------------%
 c
       external   zaxpy, zcopy, zscal, zdscal, zgemv, zgetv0, 
-     &           dlabad, zvout, zmout, ivout, arscnd
+     &           AR_DLABAD, zvout, zmout, ivout, ARSCND
 c
 c     %--------------------%
 c     | External Functions |
@@ -282,8 +282,8 @@ c
       Complex*16
      &           zdotc 
       Double precision            
-     &           dlamch,  dznrm2, zlanhs, dlapy2
-      external   zdotc, dznrm2, zlanhs, dlamch, dlapy2
+     &           AR_DLAMCH,  dznrm2, AR_ZLANHS, AR_DLAPY2
+      external   zdotc, dznrm2, AR_ZLANHS, AR_DLAMCH, AR_DLAPY2
 c
 c     %---------------------%
 c     | Intrinsic Functions |
@@ -308,13 +308,13 @@ c        | Set machine-dependent constants for the |
 c        | the splitting and deflation criterion.  |
 c        | If norm(H) <= sqrt(OVFL),               |
 c        | overflow should not occur.              |
-c        | REFERENCE: LAPACK subroutine zlahqr     |
+c        | REFERENCE: LAPACK subroutine AR_ZLAHQR     |
 c        %-----------------------------------------%
 c
-         unfl = dlamch( 'safe minimum' )
+         unfl = AR_DLAMCH( 'safe minimum' )
          ovfl = dble(one / unfl)
-         call dlabad( unfl, ovfl )
-         ulp = dlamch( 'precision' )
+         call AR_DLABAD( unfl, ovfl )
+         ulp = AR_DLAMCH( 'precision' )
          smlnum = unfl*( n / ulp )
          first = .false.
       end if
@@ -326,7 +326,7 @@ c        | Initialize timing statistics  |
 c        | & message level for debugging |
 c        %-------------------------------%
 c
-         call arscnd (t0)
+         call ARSCND (t0)
          msglvl = mcaitr
 c 
 c        %------------------------------%
@@ -437,7 +437,7 @@ c              | which spans OP and exit.                       |
 c              %------------------------------------------------%
 c
                info = j - 1
-               call arscnd (t1)
+               call ARSCND (t1)
                tcaitr = tcaitr + (t1 - t0)
                ido = 99
                go to 9000
@@ -461,12 +461,12 @@ c
 c
 c            %-----------------------------------------%
 c            | To scale both v_{j} and p_{j} carefully |
-c            | use LAPACK routine zlascl               |
+c            | use LAPACK routine AR_ZLASCL               |
 c            %-----------------------------------------%
 c
-             call zlascl ('General', i, i, rnorm, rone,
+             call AR_ZLASCL ('General', i, i, rnorm, rone,
      &                    n, 1, v(1,j), n, infol)
-             call zlascl ('General', i, i, rnorm, rone,  
+             call AR_ZLASCL ('General', i, i, rnorm, rone,  
      &                    n, 1, workd(ipj), n, infol)
          end if
 c
@@ -477,7 +477,7 @@ c        %------------------------------------------------------%
 c
          step3 = .true.
          nopx  = nopx + 1
-         call arscnd (t2)
+         call ARSCND (t2)
          call zcopy (n, v(1,j), 1, workd(ivj), 1)
          ipntr(1) = ivj
          ipntr(2) = irj
@@ -497,7 +497,7 @@ c        | WORKD(IRJ:IRJ+N-1) := OP*v_{j}   |
 c        | if step3 = .true.                |
 c        %----------------------------------%
 c
-         call arscnd (t3)
+         call ARSCND (t3)
          tmvopx = tmvopx + (t3 - t2)
  
          step3 = .false.
@@ -513,7 +513,7 @@ c        | STEP 4:  Finish extending the Arnoldi |
 c        |          factorization to length j.   |
 c        %---------------------------------------%
 c
-         call arscnd (t2)
+         call ARSCND (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             step4 = .true.
@@ -538,7 +538,7 @@ c        | if step4 = .true.                |
 c        %----------------------------------%
 c
          if (bmat .eq. 'G') then
-            call arscnd (t3)
+            call ARSCND (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if
 c 
@@ -551,7 +551,7 @@ c        %-------------------------------------%
 c
          if (bmat .eq. 'G') then  
              cnorm = zdotc (n, resid, 1, workd(ipj), 1)
-             wnorm = sqrt( dlapy2(dble(cnorm),dimag(cnorm)) )
+             wnorm = sqrt( AR_DLAPY2(dble(cnorm),dimag(cnorm)) )
          else if (bmat .eq. 'I') then
              wnorm = dznrm2(n, resid, 1)
          end if
@@ -583,11 +583,11 @@ c
 c
          if (j .gt. 1) h(j,j-1) = dcmplx(betaj, rzero)
 c
-         call arscnd (t4)
+         call ARSCND (t4)
 c 
          orth1 = .true.
 c 
-         call arscnd (t2)
+         call ARSCND (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             call zcopy (n, resid, 1, workd(irj), 1)
@@ -611,7 +611,7 @@ c        | WORKD(IPJ:IPJ+N-1) := B*r_{j}.                    |
 c        %---------------------------------------------------%
 c
          if (bmat .eq. 'G') then
-            call arscnd (t3)
+            call ARSCND (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if
 c 
@@ -623,7 +623,7 @@ c        %------------------------------%
 c
          if (bmat .eq. 'G') then         
             cnorm = zdotc (n, resid, 1, workd(ipj), 1)
-            rnorm = sqrt( dlapy2(dble(cnorm),dimag(cnorm)) )
+            rnorm = sqrt( AR_DLAPY2(dble(cnorm),dimag(cnorm)) )
          else if (bmat .eq. 'I') then
             rnorm = dznrm2(n, resid, 1)
          end if
@@ -689,7 +689,7 @@ c
          call zaxpy (j, one, workd(irj), 1, h(1,j), 1)
 c 
          orth2 = .true.
-         call arscnd (t2)
+         call ARSCND (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             call zcopy (n, resid, 1, workd(irj), 1)
@@ -713,7 +713,7 @@ c        | Back from reverse communication if ORTH2 = .true. |
 c        %---------------------------------------------------%
 c
          if (bmat .eq. 'G') then
-            call arscnd (t3)
+            call ARSCND (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if 
 c
@@ -723,7 +723,7 @@ c        %-----------------------------------------------------%
 c 
          if (bmat .eq. 'G') then         
              cnorm  = zdotc (n, resid, 1, workd(ipj), 1)
-             rnorm1 = sqrt( dlapy2(dble(cnorm),dimag(cnorm)) )
+             rnorm1 = sqrt( AR_DLAPY2(dble(cnorm),dimag(cnorm)) )
          else if (bmat .eq. 'I') then
              rnorm1 = dznrm2(n, resid, 1)
          end if
@@ -791,7 +791,7 @@ c
          rstart = .false.
          orth2  = .false.
 c 
-         call arscnd (t5)
+         call ARSCND (t5)
          titref = titref + (t5 - t4)
 c 
 c        %------------------------------------%
@@ -800,7 +800,7 @@ c        %------------------------------------%
 c
          j = j + 1
          if (j .gt. k+np) then
-            call arscnd (t1)
+            call ARSCND (t1)
             tcaitr = tcaitr + (t1 - t0)
             ido = 99
             do 110 i = max(1,k), k+np-1
@@ -808,14 +808,14 @@ c
 c              %--------------------------------------------%
 c              | Check for splitting and deflation.         |
 c              | Use a standard test as in the QR algorithm |
-c              | REFERENCE: LAPACK subroutine zlahqr        |
+c              | REFERENCE: LAPACK subroutine AR_ZLAHQR        |
 c              %--------------------------------------------%
 c     
-               tst1 = dlapy2(dble(h(i,i)),dimag(h(i,i)))
-     &              + dlapy2(dble(h(i+1,i+1)), dimag(h(i+1,i+1)))
+               tst1 = AR_DLAPY2(dble(h(i,i)),dimag(h(i,i)))
+     &              + AR_DLAPY2(dble(h(i+1,i+1)), dimag(h(i+1,i+1)))
                if( tst1.eq.dble(zero) )
-     &              tst1 = zlanhs( '1', k+np, h, ldh, workd(n+1) )
-               if( dlapy2(dble(h(i+1,i)),dimag(h(i+1,i))) .le. 
+     &              tst1 = AR_ZLANHS( '1', k+np, h, ldh, workd(n+1) )
+               if( AR_DLAPY2(dble(h(i+1,i)),dimag(h(i+1,i))) .le. 
      &                    max( ulp*tst1, smlnum ) ) 
      &             h(i+1,i) = zero
  110        continue

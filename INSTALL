@@ -1,0 +1,7 @@
+Because of the mangled names, the following FC option
+is needed. Run make as follows:
+
+make FFLAGS="-ffixed-line-length-132"
+
+In order to compile the examples, a BLAS library has to
+be provided in ARmake.inc.

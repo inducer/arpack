@@ -93,8 +93,8 @@ c     | External Functions |
 c     %--------------------%
 c
       Double precision     
-     &           dlapy2
-      external   dlapy2
+     &           AR_DLAPY2
+      external   AR_DLAPY2
 c
 c     %-----------------------%
 c     | Executable Statements |
@@ -117,8 +117,8 @@ c
 c
             if (j.lt.0) go to 30
 c
-            temp1 = dlapy2(xreal(j),ximag(j))
-            temp2 = dlapy2(xreal(j+igap),ximag(j+igap))
+            temp1 = AR_DLAPY2(xreal(j),ximag(j))
+            temp2 = AR_DLAPY2(xreal(j+igap),ximag(j+igap))
 c
             if (temp1.gt.temp2) then
                 temp = xreal(j)
@@ -158,8 +158,8 @@ c
 c
             if (j .lt. 0) go to 60
 c
-            temp1 = dlapy2(xreal(j),ximag(j))
-            temp2 = dlapy2(xreal(j+igap),ximag(j+igap))
+            temp1 = AR_DLAPY2(xreal(j),ximag(j))
+            temp2 = AR_DLAPY2(xreal(j+igap),ximag(j+igap))
 c
             if (temp1.lt.temp2) then
                temp = xreal(j)

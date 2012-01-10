@@ -29,7 +29,7 @@ c          If ISHIFT=0, NP is the number of shifts the user needs
 c          to provide via reverse comunication. 0 < NP < NCV-NEV.
 c          NP may be less than NCV-NEV for two reasons. The first, is
 c          to keep complex conjugate pairs of "wanted" Ritz values 
-c          together. The second, is that a leading block of the current
+c          together. The ARSCND, is that a leading block of the current
 c          upper Hessenberg matrix has split off and contains "unwanted"
 c          Ritz values.
 c          Upon termination of the IRA iteration, NP contains the number 
@@ -39,7 +39,7 @@ c  IUPD    Integer.  (INPUT)
 c          IUPD .EQ. 0: use explicit restart instead implicit update.
 c          IUPD .NE. 0: use implicit update.
 c
-c  V       Real N by (NEV+NP) array.  (INPUT/OUTPUT)
+c  V       Real  N by (NEV+NP) array.  (INPUT/OUTPUT)
 c          The Arnoldi basis vectors are returned in the first NEV 
 c          columns of V.
 c
@@ -47,22 +47,22 @@ c  LDV     Integer.  (INPUT)
 c          Leading dimension of V exactly as declared in the calling 
 c          program.
 c
-c  H       Real (NEV+NP) by (NEV+NP) array.  (OUTPUT)
+c  H       Real  (NEV+NP) by (NEV+NP) array.  (OUTPUT)
 c          H is used to store the generated upper Hessenberg matrix
 c
 c  LDH     Integer.  (INPUT)
 c          Leading dimension of H exactly as declared in the calling 
 c          program.
 c
-c  RITZR,  Real arrays of length NEV+NP.  (OUTPUT)
+c  RITZR,  Real  arrays of length NEV+NP.  (OUTPUT)
 c  RITZI   RITZR(1:NEV) (resp. RITZI(1:NEV)) contains the real (resp.
 c          imaginary) part of the computed Ritz values of OP.
 c
-c  BOUNDS  Real array of length NEV+NP.  (OUTPUT)
+c  BOUNDS  Real  array of length NEV+NP.  (OUTPUT)
 c          BOUNDS(1:NEV) contain the error bounds corresponding to 
 c          the computed Ritz values.
 c          
-c  Q       Real (NEV+NP) by (NEV+NP) array.  (WORKSPACE)
+c  Q       Real  (NEV+NP) by (NEV+NP) array.  (WORKSPACE)
 c          Private (replicated) work array used to accumulate the
 c          rotation in the shift application step.
 c
@@ -70,7 +70,7 @@ c  LDQ     Integer.  (INPUT)
 c          Leading dimension of Q exactly as declared in the calling
 c          program.
 c
-c  WORKL   Real work array of length at least 
+c  WORKL   Real  work array of length at least 
 c          (NEV+NP)**2 + 3*(NEV+NP).  (INPUT/WORKSPACE)
 c          Private (replicated) array on each PE or array allocated on
 c          the front end.  It is used in shifts calculation, shifts
@@ -95,7 +95,7 @@ c          IPNTR(3): pointer to the vector B * X when used in the
 c                    shift-and-invert mode.  X is the current operand.
 c          -------------------------------------------------------------
 c          
-c  WORKD   Real work array of length 3*N.  (WORKSPACE)
+c  WORKD   Real  work array of length 3*N.  (WORKSPACE)
 c          Distributed array to be used in the basic Arnoldi iteration
 c          for reverse communication.  The user should not use WORKD
 c          as temporary workspace during the iteration !!!!!!!!!!
@@ -143,11 +143,11 @@ c     sneigh  ARPACK compute Ritz values and error bounds routine.
 c     sngets  ARPACK reorder Ritz values and error bounds routine.
 c     ssortc  ARPACK sorting routine.
 c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
+c     ARSCND  ARPACK utility routine for timing.
 c     smout   ARPACK utility routine that prints matrices
 c     svout   ARPACK utility routine that prints vectors.
-c     slamch  LAPACK routine that determines machine constants.
-c     slapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
+c     AR_SLAMCH  LAPACK routine that determines machine constants.
+c     AR_SLAPY2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
 c     scopy   Level 1 BLAS that copies one vector to another .
 c     sdot    Level 1 BLAS that computes the scalar product of two vectors. 
 c     snrm2   Level 1 BLAS that computes the norm of a vector.
@@ -190,7 +190,7 @@ c
       character  bmat*1, which*2
       integer    ido, info, ishift, iupd, mode, ldh, ldq, ldv, mxiter,
      &           n, nev, np
-      Real
+      Real 
      &           tol
 c
 c     %-----------------%
@@ -198,7 +198,7 @@ c     | Array Arguments |
 c     %-----------------%
 c
       integer    ipntr(13)
-      Real
+      Real 
      &           bounds(nev+np), h(ldh,nev+np), q(ldq,nev+np), resid(n),
      &           ritzi(nev+np), ritzr(nev+np), v(ldv,nev+np), 
      &           workd(3*n), workl( (nev+np)*(nev+np+3) )
@@ -207,9 +207,9 @@ c     %------------%
 c     | Parameters |
 c     %------------%
 c
-      Real
+      Real 
      &           one, zero
-      parameter (one = 1.0E+0, zero = 0.0E+0)
+      parameter (one = 1.0E+0 , zero = 0.0E+0 )
 c
 c     %---------------%
 c     | Local Scalars |
@@ -219,7 +219,7 @@ c
       logical    cnorm , getv0, initv, update, ushift
       integer    ierr  , iter , j    , kplusp, msglvl, nconv, 
      &           nevbef, nev0 , np0  , nptemp, numcnv
-      Real
+      Real 
      &           rnorm , temp , eps23
       save       cnorm , getv0, initv, update, ushift,
      &           rnorm , iter , eps23, kplusp, msglvl, nconv , 
@@ -236,15 +236,15 @@ c     | External Subroutines |
 c     %----------------------%
 c
       external   scopy , sgetv0, snaitr, snconv, sneigh, 
-     &           sngets, snapps, svout , ivout , arscnd
+     &           sngets, snapps, svout , ivout , ARSCND
 c
 c     %--------------------%
 c     | External Functions |
 c     %--------------------%
 c
-      Real
-     &           sdot, snrm2, slapy2, slamch
-      external   sdot, snrm2, slapy2, slamch
+      Real 
+     &           sdot, snrm2, AR_SLAPY2, AR_SLAMCH
+      external   sdot, snrm2, AR_SLAPY2, AR_SLAMCH
 c
 c     %---------------------%
 c     | Intrinsic Functions |
@@ -258,7 +258,7 @@ c     %-----------------------%
 c
       if (ido .eq. 0) then
 c 
-         call arscnd (t0)
+         call ARSCND (t0)
 c 
          msglvl = mnaup2
 c 
@@ -266,8 +266,8 @@ c        %-------------------------------------%
 c        | Get the machine dependent constant. |
 c        %-------------------------------------%
 c
-         eps23 = slamch('Epsilon-Machine')
-         eps23 = eps23**(2.0E+0 / 3.0E+0)
+         eps23 = AR_SLAMCH('Epsilon-Machine')
+         eps23 = eps23**(2.0E+0  / 3.0E+0 )
 c
          nev0   = nev
          np0    = np
@@ -591,7 +591,7 @@ c           | by 1 / max(eps23,magnitude of the Ritz value).   |
 c           %--------------------------------------------------%
 c
             do 35 j = 1, numcnv
-                temp = max(eps23,slapy2(ritzr(j),
+                temp = max(eps23,AR_SLAPY2(ritzr(j),
      &                                   ritzi(j)))
                 bounds(j) = bounds(j)/temp
  35         continue
@@ -612,7 +612,7 @@ c           | value.                                       |
 c           %----------------------------------------------%
 c
             do 40 j = 1, numcnv
-                temp = max(eps23, slapy2(ritzr(j),
+                temp = max(eps23, AR_SLAPY2(ritzr(j),
      &                                   ritzi(j)))
                 bounds(j) = bounds(j)*temp
  40         continue
@@ -758,7 +758,7 @@ c        | the first step of the next call to snaitr.  |
 c        %---------------------------------------------%
 c
          cnorm = .true.
-         call arscnd (t2)
+         call ARSCND (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             call scopy (n, resid, 1, workd(n+1), 1)
@@ -783,7 +783,7 @@ c        | WORKD(1:N) := B*RESID            |
 c        %----------------------------------%
 c
          if (bmat .eq. 'G') then
-            call arscnd (t3)
+            call ARSCND (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if
 c 
@@ -822,7 +822,7 @@ c     %------------%
 c     | Error Exit |
 c     %------------%
 c
-      call arscnd (t1)
+      call ARSCND (t1)
       tnaup2 = t1 - t0
 c     
  9000 continue

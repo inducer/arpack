@@ -8,7 +8,7 @@ c  Compute the eigenvalues and the Schur decomposition of an upper
 c  Hessenberg submatrix in rows and columns ILO to IHI.  Only the
 c  last component of the Schur vectors are computed.
 c
-c  This is mostly a modification of the LAPACK routine dlahqr.
+c  This is mostly a modification of the LAPACK routine AR_DLAHQR.
 c  
 c\Usage:
 c  call dlaqrb
@@ -75,12 +75,12 @@ c\Local variables:
 c     xxxxxx  real
 c
 c\Routines called:
-c     dlabad  LAPACK routine that computes machine constants.
-c     dlamch  LAPACK routine that determines machine constants.
-c     dlanhs  LAPACK routine that computes various norms of a matrix.
-c     dlanv2  LAPACK routine that computes the Schur factorization of
+c     AR_DLABAD  LAPACK routine that computes machine constants.
+c     AR_DLAMCH  LAPACK routine that determines machine constants.
+c     AR_DLANHS  LAPACK routine that computes various norms of a matrix.
+c     AR_DLANV2  LAPACK routine that computes the Schur factorization of
 c             2 by 2 nonsymmetric matrix in standard form.
-c     dlarfg  LAPACK Householder reflection construction routine.
+c     AR_DLARFG  LAPACK Householder reflection construction routine.
 c     dcopy   Level 1 BLAS that copies one vector to another.
 c     drot    Level 1 BLAS that applies a rotation to a 2 by 2 matrix.
 
@@ -95,7 +95,7 @@ c     Houston, Texas
 c
 c\Revision history:
 c     xx/xx/92: Version ' 2.4'
-c               Modified from the LAPACK routine dlahqr so that only the
+c               Modified from the LAPACK routine AR_DLAHQR so that only the
 c               last component of the Schur vectors are computed.
 c
 c\SCCS Information: @(#) 
@@ -151,14 +151,14 @@ c     | External Functions |
 c     %--------------------%
 c
       Double precision
-     &           dlamch, dlanhs
-      external   dlamch, dlanhs
+     &           AR_DLAMCH, AR_DLANHS
+      external   AR_DLAMCH, AR_DLANHS
 c
 c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   dcopy, dlabad, dlanv2, dlarfg, drot
+      external   dcopy, AR_DLABAD, AR_DLANV2, AR_DLARFG, drot
 c
 c     %-----------------------%
 c     | Executable Statements |
@@ -195,10 +195,10 @@ c     | Set machine-dependent constants for the stopping criterion. |
 c     | If norm(H) <= sqrt(OVFL), overflow should not occur.        |
 c     %-------------------------------------------------------------%
 c
-      unfl = dlamch( 'safe minimum' )
+      unfl = AR_DLAMCH( 'safe minimum' )
       ovfl = one / unfl
-      call dlabad( unfl, ovfl )
-      ulp = dlamch( 'precision' )
+      call AR_DLABAD( unfl, ovfl )
+      ulp = AR_DLAMCH( 'precision' )
       smlnum = unfl*( nh / ulp )
 c
 c     %---------------------------------------------------------------%
@@ -256,7 +256,7 @@ c
          do 20 k = i, l + 1, -1
             tst1 = abs( h( k-1, k-1 ) ) + abs( h( k, k ) )
             if( tst1.eq.zero )
-     &         tst1 = dlanhs( '1', i-l+1, h( l, l ), ldh, work )
+     &         tst1 = AR_DLANHS( '1', i-l+1, h( l, l ), ldh, work )
             if( abs( h( k, k-1 ) ).le.max( ulp*tst1, smlnum ) )
      &         go to 30
    20    continue
@@ -369,7 +369,7 @@ c
             nr = min( 3, i-k+1 )
             if( k.gt.m )
      &         call dcopy( nr, h( k, k-1 ), 1, v, 1 )
-            call dlarfg( nr, v( 1 ), v( 2 ), 1, t1 )
+            call AR_DLARFG( nr, v( 1 ), v( 2 ), 1, t1 )
             if( k.gt.m ) then
                h( k, k-1 ) = v( 1 )
                h( k+1, k-1 ) = zero
@@ -481,7 +481,7 @@ c        | Transform the 2-by-2 submatrix to standard Schur form, |
 c        | and compute and store the eigenvalues.                 |
 c        %--------------------------------------------------------%
 c
-         call dlanv2( h( i-1, i-1 ), h( i-1, i ), h( i, i-1 ),
+         call AR_DLANV2( h( i-1, i-1 ), h( i-1, i ), h( i, i-1 ),
      &                h( i, i ), wr( i-1 ), wi( i-1 ), wr( i ), wi( i ),
      &                cs, sn )
  

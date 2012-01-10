@@ -89,9 +89,9 @@ c     a k-Step Arnoldi Method", SIAM J. Matr. Anal. Apps., 13 (1992),
 c     pp 357-385.
 c
 c\Routines called:
-c     arscnd  ARPACK utility routine for timing.
+c     ARSCND  ARPACK utility routine for timing.
 c     cvout   ARPACK utility routine that prints vectors.
-c     clarnv  LAPACK routine for generating a random vector. 
+c     AR_CLARNV  LAPACK routine for generating a random vector. 
 c     cgemv   Level 2 BLAS routine for matrix vector multiplication.
 c     ccopy   Level 1 BLAS that copies one vector to another.
 c     cdotc   Level 1 BLAS that computes the scalar product of two vectors.
@@ -168,17 +168,17 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   ccopy, cgemv, clarnv, cvout, arscnd
+      external   ccopy, cgemv, AR_CLARNV, cvout, ARSCND
 c
 c     %--------------------%
 c     | External Functions |
 c     %--------------------%
 c
       Real 
-     &           scnrm2, slapy2
+     &           scnrm2, AR_SLAPY2
       Complex
      &           cdotc
-      external   cdotc, scnrm2, slapy2
+      external   cdotc, scnrm2, AR_SLAPY2
 c
 c     %-----------------%
 c     | Data Statements |
@@ -211,7 +211,7 @@ c        | Initialize timing statistics  |
 c        | & message level for debugging |
 c        %-------------------------------%
 c
-         call arscnd (t0)
+         call ARSCND (t0)
          msglvl = mgetv0
 c 
          ierr   = 0
@@ -230,7 +230,7 @@ c        %-----------------------------------------------------%
 c
          if (.not.initv) then
             idist = 2
-            call clarnv (idist, iseed, n, resid)
+            call AR_CLARNV (idist, iseed, n, resid)
          end if
 c 
 c        %----------------------------------------------------------%
@@ -238,7 +238,7 @@ c        | Force the starting vector into the range of OP to handle |
 c        | the generalized problem when B is possibly (singular).   |
 c        %----------------------------------------------------------%
 c
-         call arscnd (t2)
+         call ARSCND (t2)
          if (bmat .eq. 'G') then
             nopx = nopx + 1
             ipntr(1) = 1
@@ -261,7 +261,7 @@ c     %-----------------------------------------------%
 c
       if (orth)  go to 40
 c 
-      call arscnd (t3)
+      call ARSCND (t3)
       tmvopx = tmvopx + (t3 - t2)
 c 
 c     %------------------------------------------------------%
@@ -269,7 +269,7 @@ c     | Starting vector is now in the range of OP; r = OP*r; |
 c     | Compute B-norm of starting vector.                   |
 c     %------------------------------------------------------%
 c
-      call arscnd (t2)
+      call ARSCND (t2)
       first = .TRUE.
       if (bmat .eq. 'G') then
          nbx = nbx + 1
@@ -285,14 +285,14 @@ c
    20 continue
 c
       if (bmat .eq. 'G') then
-         call arscnd (t3)
+         call ARSCND (t3)
          tmvbx = tmvbx + (t3 - t2)
       end if
 c 
       first = .FALSE.
       if (bmat .eq. 'G') then
           cnorm  = cdotc (n, resid, 1, workd, 1)
-          rnorm0 = sqrt(slapy2(real(cnorm),aimag(cnorm)))
+          rnorm0 = sqrt(AR_SLAPY2(real(cnorm),aimag(cnorm)))
       else if (bmat .eq. 'I') then
            rnorm0 = scnrm2(n, resid, 1)
       end if
@@ -328,7 +328,7 @@ c     %----------------------------------------------------------%
 c     | Compute the B-norm of the orthogonalized starting vector |
 c     %----------------------------------------------------------%
 c
-      call arscnd (t2)
+      call ARSCND (t2)
       if (bmat .eq. 'G') then
          nbx = nbx + 1
          call ccopy (n, resid, 1, workd(n+1), 1)
@@ -343,13 +343,13 @@ c
    40 continue
 c
       if (bmat .eq. 'G') then
-         call arscnd (t3)
+         call ARSCND (t3)
          tmvbx = tmvbx + (t3 - t2)
       end if
 c 
       if (bmat .eq. 'G') then
          cnorm = cdotc (n, resid, 1, workd, 1)
-         rnorm = sqrt(slapy2(real(cnorm),aimag(cnorm)))
+         rnorm = sqrt(AR_SLAPY2(real(cnorm),aimag(cnorm)))
       else if (bmat .eq. 'I') then
          rnorm = scnrm2(n, resid, 1)
       end if
@@ -401,7 +401,7 @@ c
       end if
       ido = 99
 c 
-      call arscnd (t1)
+      call ARSCND (t1)
       tgetv0 = tgetv0 + (t1 - t0)
 c 
  9000 continue

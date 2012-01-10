@@ -92,17 +92,17 @@ c     pp 357-385.
 c
 c\Routines called:
 c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
+c     ARSCND  ARPACK utility routine for timing.
 c     zmout   ARPACK utility routine that prints matrices
 c     zvout   ARPACK utility routine that prints vectors.
-c     zlacpy  LAPACK matrix copy routine.
-c     zlanhs  LAPACK routine that computes various norms of a matrix.
-c     zlartg  LAPACK Givens rotation construction routine.
-c     zlaset  LAPACK matrix initialization routine.
-c     dlabad  LAPACK routine for defining the underflow and overflow
+c     AR_ZLACPY  LAPACK matrix copy routine.
+c     AR_ZLANHS  LAPACK routine that computes various norms of a matrix.
+c     AR_ZLARTG  LAPACK Givens rotation construction routine.
+c     AR_ZLASET  LAPACK matrix initialization routine.
+c     AR_DLABAD  LAPACK routine for defining the underflow and overflow
 c             limits.
-c     dlamch  LAPACK routine that determines machine constants.
-c     dlapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
+c     AR_DLAMCH  LAPACK routine that determines machine constants.
+c     AR_DLAPY2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
 c     zgemv   Level 2 BLAS routine for matrix vector multiplication.
 c     zaxpy   Level 1 BLAS that computes a vector triad.
 c     zcopy   Level 1 BLAS that copies one vector to another.
@@ -122,7 +122,7 @@ c
 c\Remarks
 c  1. In this version, each shift is applied to all the sublocks of
 c     the Hessenberg matrix H and not just to the submatrix that it
-c     comes from. Deflation as in LAPACK routine zlahqr (QR algorithm
+c     comes from. Deflation as in LAPACK routine AR_ZLAHQR (QR algorithm
 c     for upper Hessenberg matrices ) is used.
 c     Upon output, the subdiagonals of H are enforced to be non-negative
 c     real numbers.
@@ -183,16 +183,16 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   zaxpy, zcopy, zgemv, zscal, zlacpy, zlartg, 
-     &           zvout, zlaset, dlabad, zmout, arscnd, ivout
+      external   zaxpy, zcopy, zgemv, zscal, AR_ZLACPY, AR_ZLARTG, 
+     &           zvout, AR_ZLASET, AR_DLABAD, zmout, ARSCND, ivout
 c
 c     %--------------------%
 c     | External Functions |
 c     %--------------------%
 c
       Double precision                 
-     &           zlanhs, dlamch, dlapy2
-      external   zlanhs, dlamch, dlapy2
+     &           AR_ZLANHS, AR_DLAMCH, AR_DLAPY2
+      external   AR_ZLANHS, AR_DLAMCH, AR_DLAPY2
 c
 c     %----------------------%
 c     | Intrinsics Functions |
@@ -224,13 +224,13 @@ c        %-----------------------------------------------%
 c        | Set machine-dependent constants for the       |
 c        | stopping criterion. If norm(H) <= sqrt(OVFL), |
 c        | overflow should not occur.                    |
-c        | REFERENCE: LAPACK subroutine zlahqr           |
+c        | REFERENCE: LAPACK subroutine AR_ZLAHQR           |
 c        %-----------------------------------------------%
 c
-         unfl = dlamch( 'safe minimum' )
+         unfl = AR_DLAMCH( 'safe minimum' )
          ovfl = dble(one / unfl)
-         call dlabad( unfl, ovfl )
-         ulp = dlamch( 'precision' )
+         call AR_DLABAD( unfl, ovfl )
+         ulp = AR_DLAMCH( 'precision' )
          smlnum = unfl*( n / ulp )
          first = .false.
       end if
@@ -240,7 +240,7 @@ c     | Initialize timing statistics  |
 c     | & message level for debugging |
 c     %-------------------------------%
 c
-      call arscnd (t0)
+      call ARSCND (t0)
       msglvl = mcapps
 c 
       kplusp = kev + np 
@@ -250,7 +250,7 @@ c     | Initialize Q to the identity to accumulate |
 c     | the rotations and reflections              |
 c     %--------------------------------------------%
 c
-      call zlaset ('All', kplusp, kplusp, zero, one, q, ldq)
+      call AR_ZLASET ('All', kplusp, kplusp, zero, one, q, ldq)
 c
 c     %----------------------------------------------%
 c     | Quick return if there are no shifts to apply |
@@ -282,12 +282,12 @@ c
 c           %----------------------------------------%
 c           | Check for splitting and deflation. Use |
 c           | a standard test as in the QR algorithm |
-c           | REFERENCE: LAPACK subroutine zlahqr    |
+c           | REFERENCE: LAPACK subroutine AR_ZLAHQR    |
 c           %----------------------------------------%
 c
             tst1 = zabs1( h( i, i ) ) + zabs1( h( i+1, i+1 ) )
             if( tst1.eq.rzero )
-     &         tst1 = zlanhs( '1', kplusp-jj+1, h, ldh, workl )
+     &         tst1 = AR_ZLANHS( '1', kplusp-jj+1, h, ldh, workl )
             if ( abs(dble(h(i+1,i))) 
      &           .le. max(ulp*tst1, smlnum) )  then
                if (msglvl .gt. 0) then
@@ -332,7 +332,7 @@ c           %------------------------------------------------------%
 c           | Construct the plane rotation G to zero out the bulge |
 c           %------------------------------------------------------%
 c
-            call zlartg (f, g, c, s, r)
+            call AR_ZLARTG (f, g, c, s, r)
             if (i .gt. istart) then
                h(i,i-1) = r
                h(i+1,i-1) = zero
@@ -406,7 +406,7 @@ c
       do 120 j=1,kev
          if ( dble( h(j+1,j) ) .lt. rzero .or.
      &        dimag( h(j+1,j) ) .ne. rzero ) then
-            t = h(j+1,j) / dlapy2(dble(h(j+1,j)),dimag(h(j+1,j)))
+            t = h(j+1,j) / AR_DLAPY2(dble(h(j+1,j)),dimag(h(j+1,j)))
             call zscal( kplusp-j+1, conjg(t), h(j+1,j), ldh )
             call zscal( min(j+2, kplusp), t, h(1,j+1), 1 )
             call zscal( min(j+np+1,kplusp), t, q(1,j+1), 1 )
@@ -419,7 +419,7 @@ c
 c        %--------------------------------------------%
 c        | Final check for splitting and deflation.   |
 c        | Use a standard test as in the QR algorithm |
-c        | REFERENCE: LAPACK subroutine zlahqr.       |
+c        | REFERENCE: LAPACK subroutine AR_ZLAHQR.       |
 c        | Note: Since the subdiagonals of the        |
 c        | compressed H are nonnegative real numbers, |
 c        | we take advantage of this.                 |
@@ -427,7 +427,7 @@ c        %--------------------------------------------%
 c
          tst1 = zabs1( h( i, i ) ) + zabs1( h( i+1, i+1 ) )
          if( tst1 .eq. rzero )
-     &       tst1 = zlanhs( '1', kev, h, ldh, workl )
+     &       tst1 = AR_ZLANHS( '1', kev, h, ldh, workl )
          if( dble( h( i+1,i ) ) .le. max( ulp*tst1, smlnum ) ) 
      &       h(i+1,i) = zero
  130  continue
@@ -459,7 +459,7 @@ c     %-------------------------------------------------%
 c     |  Move v(:,kplusp-kev+1:kplusp) into v(:,1:kev). |
 c     %-------------------------------------------------%
 c
-      call zlacpy ('A', n, kev, v(1,kplusp-kev+1), ldv, v, ldv)
+      call AR_ZLACPY ('A', n, kev, v(1,kplusp-kev+1), ldv, v, ldv)
 c 
 c     %--------------------------------------------------------------%
 c     | Copy the (kev+1)-st column of (V*Q) in the appropriate place |
@@ -495,7 +495,7 @@ c
       end if
 c
  9000 continue
-      call arscnd (t1)
+      call ARSCND (t1)
       tcapps = tcapps + (t1 - t0)
 c 
       return

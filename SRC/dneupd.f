@@ -97,7 +97,7 @@ c
 c          The complex Ritz vector associated with the Ritz value 
 c          with positive imaginary part is stored in two consecutive 
 c          columns.  The first column holds the real part of the Ritz 
-c          vector and the second column holds the imaginary part.  The 
+c          vector and the ARSCND column holds the imaginary part.  The 
 c          Ritz vector associated with the Ritz value with negative 
 c          imaginary part is simply the complex conjugate of the Ritz vector 
 c          associated with the positive imaginary part.
@@ -181,8 +181,8 @@ c          Error flag on output.
 c
 c          =  0: Normal exit.
 c
-c          =  1: The Schur form computed by LAPACK routine dlahqr 
-c                could not be reordered by LAPACK routine dtrsen .
+c          =  1: The Schur form computed by LAPACK routine AR_DLAHQR 
+c                could not be reordered by LAPACK routine AR_DTRSEN .
 c                Re-enter subroutine dneupd  with IPARAM(5)=NCV and 
 c                increase the size of the arrays DR and DI to have 
 c                dimension at least dimension NCV and allocate at least NCV 
@@ -197,9 +197,9 @@ c          = -5: WHICH must be one of 'LM', 'SM', 'LR', 'SR', 'LI', 'SI'
 c          = -6: BMAT must be one of 'I' or 'G'.
 c          = -7: Length of private work WORKL array is not sufficient.
 c          = -8: Error return from calculation of a real Schur form.
-c                Informational error from LAPACK routine dlahqr .
+c                Informational error from LAPACK routine AR_DLAHQR .
 c          = -9: Error return from calculation of eigenvectors.
-c                Informational error from LAPACK routine dtrevc .
+c                Informational error from LAPACK routine AR_DTREVC .
 c          = -10: IPARAM(7) must be 1,2,3,4.
 c          = -11: IPARAM(7) = 1 and BMAT = 'G' are incompatible.
 c          = -12: HOWMNY = 'S' not yet implemented
@@ -229,19 +229,19 @@ c\Routines called:
 c     ivout   ARPACK utility routine that prints integers.
 c     dmout    ARPACK utility routine that prints matrices
 c     dvout    ARPACK utility routine that prints vectors.
-c     dgeqr2   LAPACK routine that computes the QR factorization of 
+c     AR_DGEQR2   LAPACK routine that computes the QR factorization of 
 c             a matrix.
-c     dlacpy   LAPACK matrix copy routine.
-c     dlahqr   LAPACK routine to compute the real Schur form of an
+c     AR_DLACPY   LAPACK matrix copy routine.
+c     AR_DLAHQR   LAPACK routine to compute the real Schur form of an
 c             upper Hessenberg matrix.
-c     dlamch   LAPACK routine that determines machine constants.
-c     dlapy2   LAPACK routine to compute sqrt(x**2+y**2) carefully.
-c     dlaset   LAPACK matrix initialization routine.
-c     dorm2r   LAPACK routine that applies an orthogonal matrix in 
+c     AR_DLAMCH   LAPACK routine that determines machine constants.
+c     AR_DLAPY2   LAPACK routine to compute sqrt(x**2+y**2) carefully.
+c     AR_DLASET   LAPACK matrix initialization routine.
+c     AR_DORM2R   LAPACK routine that applies an orthogonal matrix in 
 c             factored form.
-c     dtrevc   LAPACK routine to compute the eigenvectors of a matrix
+c     AR_DTREVC   LAPACK routine to compute the eigenvectors of a matrix
 c             in upper quasi-triangular form.
-c     dtrsen   LAPACK routine that re-orders the Schur form.
+c     AR_DTRSEN   LAPACK routine that re-orders the Schur form.
 c     dtrmm    Level 3 BLAS matrix times an upper triangular matrix.
 c     dger     Level 2 BLAS rank one update to a matrix.
 c     dcopy    Level 1 BLAS that copies one vector to another .
@@ -363,9 +363,9 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   dcopy  , dger   , dgeqr2 , dlacpy , 
-     &           dlahqr , dlaset , dmout  , dorm2r , 
-     &           dtrevc , dtrmm  , dtrsen , dscal  , 
+      external   dcopy  , dger   , AR_DGEQR2 , AR_DLACPY , 
+     &           AR_DLAHQR , AR_DLASET , dmout  , AR_DORM2R , 
+     &           AR_DTREVC , dtrmm  , AR_DTRSEN , dscal  , 
      &           dvout  , ivout
 c
 c     %--------------------%
@@ -373,8 +373,8 @@ c     | External Functions |
 c     %--------------------%
 c
       Double precision 
-     &           dlapy2 , dnrm2 , dlamch , ddot 
-      external   dlapy2 , dnrm2 , dlamch , ddot 
+     &           AR_DLAPY2 , dnrm2 , AR_DLAMCH , ddot 
+      external   AR_DLAPY2 , dnrm2 , AR_DLAMCH , ddot 
 c
 c     %---------------------%
 c     | Intrinsic Functions |
@@ -399,7 +399,7 @@ c     %---------------------------------%
 c     | Get machine dependent constant. |
 c     %---------------------------------%
 c
-      eps23 = dlamch ('Epsilon-Machine')
+      eps23 = AR_DLAMCH ('Epsilon-Machine')
       eps23 = eps23**(2.0D+0  / 3.0D+0 )
 c
 c     %--------------%
@@ -583,7 +583,7 @@ c
          numcnv = 0
          do 11 j = 1,ncv
             temp1 = max(eps23,
-     &                 dlapy2 ( workl(irr+ncv-j), workl(iri+ncv-j) ))
+     &                 AR_DLAPY2 ( workl(irr+ncv-j), workl(iri+ncv-j) ))
             jj = workl(bounds + ncv - j)
             if (numcnv .lt. nconv .and.
      &          workl(ibd+jj-1) .le. tol*temp1) then
@@ -613,17 +613,17 @@ c
          end if
 c
 c        %-----------------------------------------------------------%
-c        | Call LAPACK routine dlahqr  to compute the real Schur form |
+c        | Call LAPACK routine AR_DLAHQR  to compute the real Schur form |
 c        | of the upper Hessenberg matrix returned by DNAUPD .        |
 c        | Make a copy of the upper Hessenberg matrix.               |
 c        | Initialize the Schur vector matrix Q to the identity.     |
 c        %-----------------------------------------------------------%
 c     
          call dcopy (ldh*ncv, workl(ih), 1, workl(iuptri), 1)
-         call dlaset ('All', ncv, ncv, 
+         call AR_DLASET ('All', ncv, ncv, 
      &                zero , one, workl(invsub),
      &                ldq)
-         call dlahqr (.true., .true.       , ncv, 
+         call AR_DLAHQR (.true., .true.       , ncv, 
      &                1     , ncv          , workl(iuptri), 
      &                ldh   , workl(iheigr), workl(iheigi),
      &                1     , ncv          , workl(invsub), 
@@ -656,7 +656,7 @@ c           %-----------------------------------------------------%
 c           | Reorder the computed upper quasi-triangular matrix. | 
 c           %-----------------------------------------------------%
 c     
-            call dtrsen ('None'       , 'V'          , 
+            call AR_DTRSEN ('None'       , 'V'          , 
      &                   select       , ncv          ,
      &                   workl(iuptri), ldh          , 
      &                   workl(invsub), ldq          , 
@@ -704,10 +704,6 @@ c        | Place the computed eigenvalues of H into DR and DI |
 c        | if a spectral transformation was not used.         |
 c        %----------------------------------------------------%
 c
-         if (nconv .ge. nev+1) then
-            nconv = nev+1
-         end if
-
          if (type .eq. 'REGULR') then 
             call dcopy (nconv, workl(iheigr), 1, dr, 1)
             call dcopy (nconv, workl(iheigi), 1, di, 1)
@@ -719,12 +715,12 @@ c        | the wanted invariant subspace located in the first NCONV |
 c        | columns of workl(invsub,ldq).                            |
 c        %----------------------------------------------------------%
 c     
-         call dgeqr2 (ncv, nconv , workl(invsub), 
+         call AR_DGEQR2 (ncv, nconv , workl(invsub), 
      &               ldq, workev, workev(ncv+1),
      &               ierr)
 c
 c        %---------------------------------------------------------%
-c        | * Postmultiply V by Q using dorm2r .                     |   
+c        | * Postmultiply V by Q using AR_DORM2R .                     |   
 c        | * Copy the first NCONV columns of VQ into Z.            |
 c        | * Postmultiply Z by R.                                  |
 c        | The N by NCONV matrix Z is now a matrix representation  |
@@ -735,11 +731,11 @@ c        | vectors associated with the real upper quasi-triangular |
 c        | matrix of order NCONV in workl(iuptri)                  |
 c        %---------------------------------------------------------%
 c     
-         call dorm2r ('Right', 'Notranspose', n            , 
+         call AR_DORM2R ('Right', 'Notranspose', n            , 
      &                ncv   , nconv        , workl(invsub),
      &                ldq   , workev       , v            , 
      &                ldv   , workd(n+1)   , ierr)
-         call dlacpy ('All', n, nconv, v, ldv, z, ldz)
+         call AR_DLACPY ('All', n, nconv, v, ldv, z, ldz)
 c
          do 20 j=1, nconv
 c     
@@ -774,7 +770,7 @@ c
                end if
  30         continue
 c
-            call dtrevc ('Right', 'Select'     , select       , 
+            call AR_DTREVC ('Right', 'Select'     , select       , 
      &                   ncv    , workl(iuptri), ldq          , 
      &                   vl     , 1            , workl(invsub),
      &                   ldq    , ncv          , outncv       ,
@@ -788,7 +784,7 @@ c
 c           %------------------------------------------------%
 c           | Scale the returning eigenvectors so that their |
 c           | Euclidean norms are all one. LAPACK subroutine |
-c           | dtrevc  returns each eigenvector normalized so  |
+c           | AR_DTREVC  returns each eigenvector normalized so  |
 c           | that the element of largest magnitude has      |
 c           | magnitude 1;                                   |
 c           %------------------------------------------------%
@@ -817,7 +813,7 @@ c                 | square root of two.                       |
 c                 %-------------------------------------------%
 c
                   if (iconj .eq. 0) then
-                     temp = dlapy2 (dnrm2 (ncv, 
+                     temp = AR_DLAPY2 (dnrm2 (ncv, 
      &                                   workl(invsub+(j-1)*ldq), 
      &                                   1),
      &                             dnrm2 (ncv, 
@@ -850,7 +846,7 @@ c                 | the eigenvector are stored in consecutive |
 c                 %-------------------------------------------%
 c
                   if (iconj .eq. 0) then
-                     workev(j) = dlapy2 (workev(j), workev(j+1))
+                     workev(j) = AR_DLAPY2 (workev(j), workev(j+1))
                      workev(j+1) = workev(j)
                      iconj = 1
                   else
@@ -882,7 +878,7 @@ c           | associated with leading portion of T in the first NCONV |
 c           | columns of workl(invsub,ldq).                           |
 c           %---------------------------------------------------------%
 c     
-            call dgeqr2 (ncv, nconv , workl(invsub), 
+            call AR_DGEQR2 (ncv, nconv , workl(invsub), 
      &                   ldq, workev, workev(ncv+1),
      &                   ierr)
 c     
@@ -894,7 +890,7 @@ c           | Ritz vectors associated with the Ritz values |
 c           | in workl(iheigr) and workl(iheigi).          |
 c           %----------------------------------------------%
 c     
-            call dorm2r ('Right', 'Notranspose', n            ,
+            call AR_DORM2R ('Right', 'Notranspose', n            ,
      &                   ncv  , nconv        , workl(invsub),
      &                   ldq  , workev       , z            ,
      &                   ldz  , workd(n+1)   , ierr)
@@ -945,7 +941,7 @@ c
      &         call dscal (ncv, rnorm, workl(ihbds), 1)
 c
             do 50 k=1, ncv
-               temp = dlapy2 ( workl(iheigr+k-1), 
+               temp = AR_DLAPY2 ( workl(iheigr+k-1), 
      &                        workl(iheigi+k-1) )
                workl(ihbds+k-1) = abs( workl(ihbds+k-1) ) 
      &                          / temp / temp
@@ -976,7 +972,7 @@ c
          if (type .eq. 'SHIFTI') then 
 c
             do 80 k=1, ncv
-               temp = dlapy2 ( workl(iheigr+k-1), 
+               temp = AR_DLAPY2 ( workl(iheigr+k-1), 
      &                        workl(iheigi+k-1) )
                workl(iheigr+k-1) = workl(iheigr+k-1)/temp/temp 
      &                           + sigmar   
@@ -1037,7 +1033,7 @@ c
                workev(j) =  workl(invsub+(j-1)*ldq+ncv-1) /
      &                      workl(iheigr+j-1)
             else if (iconj .eq. 0) then
-               temp = dlapy2 ( workl(iheigr+j-1), workl(iheigi+j-1) )
+               temp = AR_DLAPY2 ( workl(iheigr+j-1), workl(iheigi+j-1) )
                workev(j) = ( workl(invsub+(j-1)*ldq+ncv-1) * 
      &                       workl(iheigr+j-1) +
      &                       workl(invsub+j*ldq+ncv-1) * 

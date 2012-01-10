@@ -7,7 +7,7 @@ c\Description:
 c  Computes all eigenvalues and the last component of the eigenvectors
 c  of a symmetric tridiagonal matrix using the implicit QL or QR method.
 c
-c  This is mostly a modification of the LAPACK routine dsteqr.
+c  This is mostly a modification of the LAPACK routine AR_DSTEQR.
 c  See Remarks.
 c
 c\Usage:
@@ -61,23 +61,23 @@ c\Routines called:
 c     daxpy   Level 1 BLAS that computes a vector triad.
 c     dcopy   Level 1 BLAS that copies one vector to another.
 c     dswap   Level 1 BLAS that swaps the contents of two vectors.
-c     lsame   LAPACK character comparison routine.
-c     dlae2   LAPACK routine that computes the eigenvalues of a 2-by-2 
+c     AR_LSAME   LAPACK character comparison routine.
+c     AR_DLAE2   LAPACK routine that computes the eigenvalues of a 2-by-2 
 c             symmetric matrix.
-c     dlaev2  LAPACK routine that eigendecomposition of a 2-by-2 symmetric 
+c     AR_DLAEV2  LAPACK routine that eigendecomposition of a 2-by-2 symmetric 
 c             matrix.
-c     dlamch  LAPACK routine that determines machine constants.
-c     dlanst  LAPACK routine that computes the norm of a matrix.
-c     dlapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
-c     dlartg  LAPACK Givens rotation construction routine.
-c     dlascl  LAPACK routine for careful scaling of a matrix.
-c     dlaset  LAPACK matrix initialization routine.
-c     dlasr   LAPACK routine that applies an orthogonal transformation to 
+c     AR_DLAMCH  LAPACK routine that determines machine constants.
+c     AR_DLANST  LAPACK routine that computes the norm of a matrix.
+c     AR_DLAPY2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
+c     AR_DLARTG  LAPACK Givens rotation construction routine.
+c     AR_DLASCL  LAPACK routine for careful scaling of a matrix.
+c     AR_DLASET  LAPACK matrix initialization routine.
+c     AR_DLASR   LAPACK routine that applies an orthogonal transformation to 
 c             a matrix.
-c     dlasrt  LAPACK sorting routine.
-c     dsteqr  LAPACK routine that computes eigenvalues and eigenvectors
+c     AR_DLASRT  LAPACK sorting routine.
+c     AR_DSTEQR  LAPACK routine that computes eigenvalues and eigenvectors
 c             of a symmetric tridiagonal matrix.
-c     xerbla  LAPACK error handler routine.
+c     AR_XERBLA  LAPACK error handler routine.
 c
 c\Authors
 c     Danny Sorensen               Phuong Vu
@@ -92,10 +92,10 @@ c FILE: stqrb.F   SID: 2.5   DATE OF SID: 8/27/96   RELEASE: 2
 c
 c\Remarks
 c     1. Starting with version 2.5, this routine is a modified version
-c        of LAPACK version 2.0 subroutine SSTEQR. No lines are deleted,
+c        of LAPACK version 2.0 subroutine AR_SSTEQR. No lines are deleted,
 c        only commeted out and new lines inserted.
 c        All lines commented out have "c$$$" at the beginning.
-c        Note that the LAPACK version 1.0 subroutine SSTEQR contained
+c        Note that the LAPACK version 1.0 subroutine AR_SSTEQR contained
 c        bugs. 
 c
 c\EndLib
@@ -134,14 +134,14 @@ c     .. local scalars ..
      &                   s, safmax, safmin, ssfmax, ssfmin, tst
 c     ..
 c     .. external functions ..
-      logical            lsame
+      logical            AR_LSAME
       Double precision
-     &                   dlamch, dlanst, dlapy2
-      external           lsame, dlamch, dlanst, dlapy2
+     &                   AR_DLAMCH, AR_DLANST, AR_DLAPY2
+      external           AR_LSAME, AR_DLAMCH, AR_DLANST, AR_DLAPY2
 c     ..
 c     .. external subroutines ..
-      external           dlae2, dlaev2, dlartg, dlascl, dlaset, dlasr,
-     &                   dlasrt, dswap, xerbla
+      external           AR_DLAE2, AR_DLAEV2, AR_DLARTG, AR_DLASCL, AR_DLASET, AR_DLASR,
+     &                   AR_DLASRT, dswap, AR_XERBLA
 c     ..
 c     .. intrinsic functions ..
       intrinsic          abs, max, sign, sqrt
@@ -152,11 +152,11 @@ c     test the input parameters.
 c
       info = 0
 c
-c$$$      IF( LSAME( COMPZ, 'N' ) ) THEN
+c$$$      IF( AR_LSAME( COMPZ, 'N' ) ) THEN
 c$$$         ICOMPZ = 0
-c$$$      ELSE IF( LSAME( COMPZ, 'V' ) ) THEN
+c$$$      ELSE IF( AR_LSAME( COMPZ, 'V' ) ) THEN
 c$$$         ICOMPZ = 1
-c$$$      ELSE IF( LSAME( COMPZ, 'I' ) ) THEN
+c$$$      ELSE IF( AR_LSAME( COMPZ, 'I' ) ) THEN
 c$$$         ICOMPZ = 2
 c$$$      ELSE
 c$$$         ICOMPZ = -1
@@ -170,7 +170,7 @@ c$$$     $         N ) ) ) THEN
 c$$$         INFO = -6
 c$$$      END IF
 c$$$      IF( INFO.NE.0 ) THEN
-c$$$         CALL XERBLA( 'SSTEQR', -INFO )
+c$$$         CALL AR_XERBLA( 'AR_SSTEQR', -INFO )
 c$$$         RETURN
 c$$$      END IF
 c
@@ -191,9 +191,9 @@ c
 c
 c     determine the unit roundoff and over/underflow thresholds.
 c
-      eps = dlamch( 'e' )
+      eps = AR_DLAMCH( 'e' )
       eps2 = eps**2
-      safmin = dlamch( 's' )
+      safmin = AR_DLAMCH( 's' )
       safmax = one / safmin
       ssfmax = sqrt( safmax ) / three
       ssfmin = sqrt( safmin ) / eps2
@@ -202,7 +202,7 @@ c     compute the eigenvalues and eigenvectors of the tridiagonal
 c     matrix.
 c
 c$$      if( icompz.eq.2 )
-c$$$     $   call dlaset( 'full', n, n, zero, one, z, ldz )
+c$$$     $   call AR_DLASET( 'full', n, n, zero, one, z, ldz )
 c
 c     *** New starting with version 2.5 ***
 c
@@ -254,21 +254,21 @@ c
 c
 c     scale submatrix in rows and columns l to lend
 c
-      anorm = dlanst( 'i', lend-l+1, d( l ), e( l ) )
+      anorm = AR_DLANST( 'i', lend-l+1, d( l ), e( l ) )
       iscale = 0
       if( anorm.eq.zero )
      $   go to 10
       if( anorm.gt.ssfmax ) then
          iscale = 1
-         call dlascl( 'g', 0, 0, anorm, ssfmax, lend-l+1, 1, d( l ), n,
+         call AR_DLASCL( 'g', 0, 0, anorm, ssfmax, lend-l+1, 1, d( l ), n,
      $                info )
-         call dlascl( 'g', 0, 0, anorm, ssfmax, lend-l, 1, e( l ), n,
+         call AR_DLASCL( 'g', 0, 0, anorm, ssfmax, lend-l, 1, e( l ), n,
      $                info )
       else if( anorm.lt.ssfmin ) then
          iscale = 2
-         call dlascl( 'g', 0, 0, anorm, ssfmin, lend-l+1, 1, d( l ), n,
+         call AR_DLASCL( 'g', 0, 0, anorm, ssfmin, lend-l+1, 1, d( l ), n,
      $                info )
-         call dlascl( 'g', 0, 0, anorm, ssfmin, lend-l, 1, e( l ), n,
+         call AR_DLASCL( 'g', 0, 0, anorm, ssfmin, lend-l, 1, e( l ), n,
      $                info )
       end if
 c
@@ -304,15 +304,15 @@ c
          if( m.eq.l )
      $      go to 80
 c
-c        if remaining matrix is 2-by-2, use dlae2 or dlaev2
+c        if remaining matrix is 2-by-2, use AR_DLAE2 or AR_DLAEV2
 c        to compute its eigensystem.
 c
          if( m.eq.l+1 ) then
             if( icompz.gt.0 ) then
-               call dlaev2( d( l ), e( l ), d( l+1 ), rt1, rt2, c, s )
+               call AR_DLAEV2( d( l ), e( l ), d( l+1 ), rt1, rt2, c, s )
                work( l ) = c
                work( n-1+l ) = s
-c$$$               call dlasr( 'r', 'v', 'b', n, 2, work( l ),
+c$$$               call AR_DLASR( 'r', 'v', 'b', n, 2, work( l ),
 c$$$     $                     work( n-1+l ), z( 1, l ), ldz )
 c
 c              *** New starting with version 2.5 ***
@@ -322,7 +322,7 @@ c
                z(l)   = s*tst + c*z(l)
 c              *************************************
             else
-               call dlae2( d( l ), e( l ), d( l+1 ), rt1, rt2 )
+               call AR_DLAE2( d( l ), e( l ), d( l+1 ), rt1, rt2 )
             end if
             d( l ) = rt1
             d( l+1 ) = rt2
@@ -340,7 +340,7 @@ c
 c        form shift.
 c
          g = ( d( l+1 )-p ) / ( two*e( l ) )
-         r = dlapy2( g, one )
+         r = AR_DLAPY2( g, one )
          g = d( m ) - p + ( e( l ) / ( g+sign( r, g ) ) )
 c
          s = one
@@ -353,7 +353,7 @@ c
          do 70 i = mm1, l, -1
             f = s*e( i )
             b = c*e( i )
-            call dlartg( g, f, c, s, r )
+            call AR_DLARTG( g, f, c, s, r )
             if( i.ne.m-1 )
      $         e( i+1 ) = r
             g = d( i+1 ) - p
@@ -375,12 +375,12 @@ c        if eigenvectors are desired, then apply saved rotations.
 c
          if( icompz.gt.0 ) then
             mm = m - l + 1
-c$$$            call dlasr( 'r', 'v', 'b', n, mm, work( l ), work( n-1+l ),
+c$$$            call AR_DLASR( 'r', 'v', 'b', n, mm, work( l ), work( n-1+l ),
 c$$$     $                  z( 1, l ), ldz )
 c
 c             *** New starting with version 2.5 ***
 c
-              call dlasr( 'r', 'v', 'b', 1, mm, work( l ), 
+              call AR_DLASR( 'r', 'v', 'b', 1, mm, work( l ), 
      &                    work( n-1+l ), z( l ), 1 )
 c             *************************************                             
          end if
@@ -424,15 +424,15 @@ c
          if( m.eq.l )
      $      go to 130
 c
-c        if remaining matrix is 2-by-2, use dlae2 or dlaev2
+c        if remaining matrix is 2-by-2, use AR_DLAE2 or AR_DLAEV2
 c        to compute its eigensystem.
 c
          if( m.eq.l-1 ) then
             if( icompz.gt.0 ) then
-               call dlaev2( d( l-1 ), e( l-1 ), d( l ), rt1, rt2, c, s )
+               call AR_DLAEV2( d( l-1 ), e( l-1 ), d( l ), rt1, rt2, c, s )
 c$$$               work( m ) = c
 c$$$               work( n-1+m ) = s
-c$$$               call dlasr( 'r', 'v', 'f', n, 2, work( m ),
+c$$$               call AR_DLASR( 'r', 'v', 'f', n, 2, work( m ),
 c$$$     $                     work( n-1+m ), z( 1, l-1 ), ldz )
 c
 c               *** New starting with version 2.5 ***
@@ -442,7 +442,7 @@ c
                 z(l-1) = s*tst + c*z(l-1)
 c               ************************************* 
             else
-               call dlae2( d( l-1 ), e( l-1 ), d( l ), rt1, rt2 )
+               call AR_DLAE2( d( l-1 ), e( l-1 ), d( l ), rt1, rt2 )
             end if
             d( l-1 ) = rt1
             d( l ) = rt2
@@ -460,7 +460,7 @@ c
 c        form shift.
 c
          g = ( d( l-1 )-p ) / ( two*e( l-1 ) )
-         r = dlapy2( g, one )
+         r = AR_DLAPY2( g, one )
          g = d( m ) - p + ( e( l-1 ) / ( g+sign( r, g ) ) )
 c
          s = one
@@ -473,7 +473,7 @@ c
          do 120 i = m, lm1
             f = s*e( i )
             b = c*e( i )
-            call dlartg( g, f, c, s, r )
+            call AR_DLARTG( g, f, c, s, r )
             if( i.ne.m )
      $         e( i-1 ) = r
             g = d( i ) - p
@@ -495,12 +495,12 @@ c        if eigenvectors are desired, then apply saved rotations.
 c
          if( icompz.gt.0 ) then
             mm = l - m + 1
-c$$$            call dlasr( 'r', 'v', 'f', n, mm, work( m ), work( n-1+m ),
+c$$$            call AR_DLASR( 'r', 'v', 'f', n, mm, work( m ), work( n-1+m ),
 c$$$     $                  z( 1, m ), ldz )
 c
 c           *** New starting with version 2.5 ***
 c
-            call dlasr( 'r', 'v', 'f', 1, mm, work( m ), work( n-1+m ),
+            call AR_DLASR( 'r', 'v', 'f', 1, mm, work( m ), work( n-1+m ),
      &                  z( m ), 1 )
 c           *************************************                             
          end if
@@ -525,14 +525,14 @@ c     undo scaling if necessary
 c
   140 continue
       if( iscale.eq.1 ) then
-         call dlascl( 'g', 0, 0, ssfmax, anorm, lendsv-lsv+1, 1,
+         call AR_DLASCL( 'g', 0, 0, ssfmax, anorm, lendsv-lsv+1, 1,
      $                d( lsv ), n, info )
-         call dlascl( 'g', 0, 0, ssfmax, anorm, lendsv-lsv, 1, e( lsv ),
+         call AR_DLASCL( 'g', 0, 0, ssfmax, anorm, lendsv-lsv, 1, e( lsv ),
      $                n, info )
       else if( iscale.eq.2 ) then
-         call dlascl( 'g', 0, 0, ssfmin, anorm, lendsv-lsv+1, 1,
+         call AR_DLASCL( 'g', 0, 0, ssfmin, anorm, lendsv-lsv+1, 1,
      $                d( lsv ), n, info )
-         call dlascl( 'g', 0, 0, ssfmin, anorm, lendsv-lsv, 1, e( lsv ),
+         call AR_DLASCL( 'g', 0, 0, ssfmin, anorm, lendsv-lsv, 1, e( lsv ),
      $                n, info )
       end if
 c
@@ -554,7 +554,7 @@ c
 c
 c        use quick sort
 c
-         call dlasrt( 'i', n, d, info )
+         call AR_DLASRT( 'i', n, d, info )
 c
       else
 c

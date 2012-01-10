@@ -51,7 +51,7 @@ c          Private (replicated) array on each PE or array allocated on
 c          the front end. 
 c
 c  IERR    Integer.  (OUTPUT)
-c          Error exit flag from zlahqr or ztrevc.
+c          Error exit flag from AR_ZLAHQR or AR_ZTREVC.
 c
 c\EndDoc
 c
@@ -64,15 +64,15 @@ c     xxxxxx  Complex*16
 c
 c\Routines called:
 c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
+c     ARSCND  ARPACK utility routine for timing.
 c     zmout   ARPACK utility routine that prints matrices
 c     zvout   ARPACK utility routine that prints vectors.
 c     dvout   ARPACK utility routine that prints vectors.
-c     zlacpy  LAPACK matrix copy routine.
-c     zlahqr  LAPACK routine to compute the Schur form of an
+c     AR_ZLACPY  LAPACK matrix copy routine.
+c     AR_ZLAHQR  LAPACK routine to compute the Schur form of an
 c             upper Hessenberg matrix.
-c     zlaset  LAPACK matrix initialization routine.
-c     ztrevc  LAPACK routine to compute the eigenvectors of a matrix
+c     AR_ZLASET  LAPACK matrix initialization routine.
+c     AR_ZTREVC  LAPACK routine to compute the eigenvectors of a matrix
 c             in upper triangular form
 c     zcopy   Level 1 BLAS that copies one vector to another. 
 c     zdscal  Level 1 BLAS that scales a complex vector by a real number.
@@ -151,8 +151,8 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   zlacpy, zlahqr, ztrevc, zcopy, 
-     &           zdscal, zmout, zvout, arscnd
+      external   AR_ZLACPY, AR_ZLAHQR, AR_ZTREVC, zcopy, 
+     &           zdscal, zmout, zvout, ARSCND
 c
 c     %--------------------%
 c     | External Functions |
@@ -171,7 +171,7 @@ c     | Initialize timing statistics  |
 c     | & message level for debugging |
 c     %-------------------------------%
 c
-      call arscnd (t0)
+      call ARSCND (t0)
       msglvl = mceigh
 c 
       if (msglvl .gt. 2) then
@@ -183,13 +183,13 @@ c     %----------------------------------------------------------%
 c     | 1. Compute the eigenvalues, the last components of the   |
 c     |    corresponding Schur vectors and the full Schur form T |
 c     |    of the current upper Hessenberg matrix H.             |
-c     |    zlahqr returns the full Schur form of H               | 
+c     |    AR_ZLAHQR returns the full Schur form of H               | 
 c     |    in WORKL(1:N**2), and the Schur vectors in q.         |
 c     %----------------------------------------------------------%
 c
-      call zlacpy ('All', n, n, h, ldh, workl, n)
-      call zlaset ('All', n, n, zero, one, q, ldq)
-      call zlahqr (.true., .true., n, 1, n, workl, ldh, ritz,
+      call AR_ZLACPY ('All', n, n, h, ldh, workl, n)
+      call AR_ZLASET ('All', n, n, zero, one, q, ldq)
+      call AR_ZLAHQR (.true., .true., n, 1, n, workl, ldh, ritz,
      &             1, n, q, ldq, ierr)
       if (ierr .ne. 0) go to 9000
 c
@@ -205,7 +205,7 @@ c     |    apply the Schur vectors to get the corresponding      |
 c     |    eigenvectors.                                         |
 c     %----------------------------------------------------------%
 c
-      call ztrevc ('Right', 'Back', select, n, workl, n, vl, n, q, 
+      call AR_ZTREVC ('Right', 'Back', select, n, workl, n, vl, n, q, 
      &             ldq, n, n, workl(n*n+1), rwork, ierr)
 c
       if (ierr .ne. 0) go to 9000
@@ -213,7 +213,7 @@ c
 c     %------------------------------------------------%
 c     | Scale the returning eigenvectors so that their |
 c     | Euclidean norms are all one. LAPACK subroutine |
-c     | ztrevc returns each eigenvector normalized so  |
+c     | AR_ZTREVC returns each eigenvector normalized so  |
 c     | that the element of largest magnitude has      |
 c     | magnitude 1; here the magnitude of a complex   |
 c     | number (x,y) is taken to be |x| + |y|.         |
@@ -244,7 +244,7 @@ c
      &              '_neigh: Ritz estimates for the eigenvalues of H')
       end if
 c
-      call arscnd(t1)
+      call ARSCND(t1)
       tceigh = tceigh + (t1 - t0)
 c
  9000 continue

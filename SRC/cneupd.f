@@ -66,11 +66,11 @@ c          Ritz value D(j), SELECT(j) must be set to .TRUE..
 c          If HOWMNY = 'A' or 'P', SELECT need not be initialized 
 c          but it is used as internal workspace.
 c
-c  D       Complex array of dimension NEV+1.  (OUTPUT)
+c  D       Complex  array of dimension NEV+1.  (OUTPUT)
 c          On exit, D contains the  Ritz  approximations 
 c          to the eigenvalues lambda for A*z = lambda*B*z.
 c
-c  Z       Complex N by NEV array    (OUTPUT)
+c  Z       Complex  N by NEV array    (OUTPUT)
 c          On exit, if RVEC = .TRUE. and HOWMNY = 'A', then the columns of 
 c          Z represents approximate eigenvectors (Ritz vectors) corresponding 
 c          to the NCONV=IPARAM(5) Ritz values for eigensystem
@@ -88,11 +88,11 @@ c          The leading dimension of the array Z.  If Ritz vectors are
 c          desired, then  LDZ .ge.  max( 1, N ) is required.  
 c          In any case,  LDZ .ge. 1 is required.
 c
-c  SIGMA   Complex  (INPUT)
+c  SIGMA   Complex   (INPUT)
 c          If IPARAM(7) = 3 then SIGMA represents the shift. 
 c          Not referenced if IPARAM(7) = 1 or 2.
 c
-c  WORKEV  Complex work array of dimension 2*NCV.  (WORKSPACE)
+c  WORKEV  Complex  work array of dimension 2*NCV.  (WORKSPACE)
 c
 c  **** The remaining arguments MUST be the same as for the   ****
 c  **** call to CNAUPD that was just completed.               ****
@@ -108,7 +108,7 @@ c         the the last call to CNAUPD and the call to CNEUPD.
 c
 c  Three of these parameters (V, WORKL and INFO) are also output parameters:
 c
-c  V       Complex N by NCV array.  (INPUT/OUTPUT)
+c  V       Complex  N by NCV array.  (INPUT/OUTPUT)
 c
 c          Upon INPUT: the NCV columns of V contain the Arnoldi basis
 c                      vectors for OP as constructed by CNAUPD .
@@ -124,7 +124,7 @@ c          Ritz vectors.  If a separate array Z has been passed then
 c          the first NCONV=IPARAM(5) columns of V will contain approximate
 c          Schur vectors that span the desired invariant subspace.
 c
-c  WORKL   Real work array of length LWORKL.  (OUTPUT/WORKSPACE)
+c  WORKL   Real  work array of length LWORKL.  (OUTPUT/WORKSPACE)
 c          WORKL(1:ncv*ncv+2*ncv) contains information obtained in
 c          cnaupd.  They are not changed by cneupd.
 c          WORKL(ncv*ncv+2*ncv+1:3*ncv*ncv+4*ncv) holds the
@@ -151,7 +151,7 @@ c          Error flag on output.
 c          =  0: Normal exit.
 c
 c          =  1: The Schur form computed by LAPACK routine csheqr
-c                could not be reordered by LAPACK routine ctrsen.
+c                could not be reordered by LAPACK routine AR_CTRSEN.
 c                Re-enter subroutine cneupd with IPARAM(5)=NCV and
 c                increase the size of the array D to have
 c                dimension at least dimension NCV and allocate at least NCV
@@ -161,14 +161,14 @@ c                occurs.
 c
 c          = -1: N must be positive.
 c          = -2: NEV must be positive.
-c          = -3: NCV-NEV >= 1 and less than or equal to N.
+c          = -3: NCV-NEV >= 2 and less than or equal to N.
 c          = -5: WHICH must be one of 'LM', 'SM', 'LR', 'SR', 'LI', 'SI'
 c          = -6: BMAT must be one of 'I' or 'G'.
 c          = -7: Length of private work WORKL array is not sufficient.
 c          = -8: Error return from LAPACK eigenvalue calculation.
 c                This should never happened.
 c          = -9: Error return from calculation of eigenvectors.
-c                Informational error from LAPACK routine ctrevc.
+c                Informational error from LAPACK routine AR_CTREVC.
 c          = -10: IPARAM(7) must be 1,2,3
 c          = -11: IPARAM(7) = 1 and BMAT = 'G' are incompatible.
 c          = -12: HOWMNY = 'S' not yet implemented
@@ -198,18 +198,18 @@ c\Routines called:
 c     ivout   ARPACK utility routine that prints integers.
 c     cmout   ARPACK utility routine that prints matrices
 c     cvout   ARPACK utility routine that prints vectors.
-c     cgeqr2  LAPACK routine that computes the QR factorization of 
+c     AR_CGEQR2  LAPACK routine that computes the QR factorization of 
 c             a matrix.
-c     clacpy  LAPACK matrix copy routine.
-c     clahqr  LAPACK routine that computes the Schur form of a
+c     AR_CLACPY  LAPACK matrix copy routine.
+c     AR_CLAHQR  LAPACK routine that computes the Schur form of a
 c             upper Hessenberg matrix.
-c     claset  LAPACK matrix initialization routine.
-c     ctrevc  LAPACK routine to compute the eigenvectors of a matrix
+c     AR_CLASET  LAPACK matrix initialization routine.
+c     AR_CTREVC  LAPACK routine to compute the eigenvectors of a matrix
 c             in upper triangular form.
-c     ctrsen  LAPACK routine that re-orders the Schur form.
-c     cunm2r  LAPACK routine that applies an orthogonal matrix in 
+c     AR_CTRSEN  LAPACK routine that re-orders the Schur form.
+c     AR_CUNM2R  LAPACK routine that applies an orthogonal matrix in 
 c             factored form.
-c     slamch  LAPACK routine that determines machine constants.
+c     AR_SLAMCH  LAPACK routine that determines machine constants.
 c     ctrmm   Level 3 BLAS matrix times an upper triangular matrix.
 c     cgeru   Level 2 BLAS rank one update to a matrix.
 c     ccopy   Level 1 BLAS that copies one vector to another .
@@ -240,7 +240,7 @@ c     Rice University
 c     Houston, Texas
 c
 c\SCCS Information: @(#)
-c FILE: neupd.F   SID: 2.8   DATE OF SID: 07/21/02   RELEASE: 2
+c FILE: neupd.F   SID: 2.7   DATE OF SID: 09/20/00   RELEASE: 2
 c
 c\EndLib
 c
@@ -266,9 +266,9 @@ c
       character  bmat, howmny, which*2
       logical    rvec
       integer    info, ldz, ldv, lworkl, n, ncv, nev
-      Complex     
+      Complex      
      &           sigma
-      Real 
+      Real  
      &           tol
 c
 c     %-----------------%
@@ -277,9 +277,9 @@ c     %-----------------%
 c
       integer    iparam(11), ipntr(14)
       logical    select(ncv)
-      Real
+      Real 
      &           rwork(ncv)
-      Complex
+      Complex 
      &           d(nev)     , resid(n)     , v(ldv,ncv),
      &           z(ldz, nev), 
      &           workd(3*n) , workl(lworkl), workev(2*ncv)
@@ -288,9 +288,9 @@ c     %------------%
 c     | Parameters |
 c     %------------%
 c
-      Complex
+      Complex 
      &           one, zero
-      parameter  (one = (1.0E+0, 0.0E+0), zero = (0.0E+0, 0.0E+0))
+      parameter  (one = (1.0E+0, 0.0E+0) , zero = (0.0E+0, 0.0E+0) )
 c
 c     %---------------%
 c     | Local Scalars |
@@ -302,9 +302,9 @@ c
      &           mode  , msglvl, ritz  , wr   , k     , irz   ,
      &           ibd   , outncv, iq    , np   , numcnv, jj    ,
      &           ishift, nconv2
-      Complex
+      Complex 
      &           rnorm, temp, vl(1)
-      Real
+      Real 
      &           conds, sep, rtemp, eps23
       logical    reord
 c
@@ -312,19 +312,19 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   ccopy , cgeru, cgeqr2, clacpy, cmout,
-     &           cunm2r, ctrmm, cvout, ivout,
-     &           clahqr
+      external   ccopy , cgeru, AR_CGEQR2, AR_CLACPY, cmout,
+     &           AR_CUNM2R, ctrmm, cvout, ivout,
+     &           AR_CLAHQR
 c  
 c     %--------------------%
 c     | External Functions |
 c     %--------------------%
 c
-      Real
-     &           scnrm2, slamch, slapy2
-      external   scnrm2, slamch, slapy2
+      Real 
+     &           scnrm2, AR_SLAMCH, AR_SLAPY2
+      external   scnrm2, AR_SLAMCH, AR_SLAPY2
 c
-      Complex
+      Complex 
      &           cdotc
       external   cdotc
 c
@@ -346,8 +346,8 @@ c     %---------------------------------%
 c     | Get machine dependent constant. |
 c     %---------------------------------%
 c
-      eps23 = slamch('Epsilon-Machine')
-      eps23 = eps23**(2.0E+0 / 3.0E+0)
+      eps23 = AR_SLAMCH('Epsilon-Machine')
+      eps23 = eps23**(2.0E+0  / 3.0E+0 )
 c
 c     %-------------------------------%
 c     | Quick return                  |
@@ -362,7 +362,7 @@ c
          ierr = -1
       else if (nev .le. 0) then
          ierr = -2
-      else if (ncv .le. nev .or.  ncv .gt. n) then
+      else if (ncv .le. nev+1 .or.  ncv .gt. n) then
          ierr = -3
       else if (which .ne. 'LM' .and.
      &        which .ne. 'SM' .and.
@@ -515,11 +515,11 @@ c
          numcnv = 0
          do 11 j = 1,ncv
             rtemp = max(eps23,
-     &                 slapy2 ( real(workl(irz+ncv-j)),
+     &                 AR_SLAPY2 ( real (workl(irz+ncv-j)),
      &                          aimag(workl(irz+ncv-j)) ))
             jj = workl(bounds + ncv - j)
             if (numcnv .lt. nconv .and.
-     &          slapy2( real(workl(ibd+jj-1)),
+     &          AR_SLAPY2( real (workl(ibd+jj-1)),
      &          aimag(workl(ibd+jj-1)) )
      &          .le. tol*rtemp) then
                select(jj) = .true.
@@ -548,17 +548,17 @@ c
          end if
 c
 c        %-------------------------------------------------------%
-c        | Call LAPACK routine clahqr to compute the Schur form |
+c        | Call LAPACK routine AR_CLAHQR to compute the Schur form |
 c        | of the upper Hessenberg matrix returned by CNAUPD.   |
 c        | Make a copy of the upper Hessenberg matrix.           |
 c        | Initialize the Schur vector matrix Q to the identity. |
 c        %-------------------------------------------------------%
 c
          call ccopy(ldh*ncv, workl(ih), 1, workl(iuptri), 1)
-         call claset('All', ncv, ncv          , 
+         call AR_CLASET('All', ncv, ncv          , 
      &                zero , one, workl(invsub),
      &                ldq)
-         call clahqr(.true., .true.       , ncv          , 
+         call AR_CLAHQR(.true., .true.       , ncv          , 
      &                1     , ncv          , workl(iuptri),
      &                ldh   , workl(iheig) , 1            ,
      &                ncv   , workl(invsub), ldq          ,
@@ -589,7 +589,7 @@ c           %-----------------------------------------------%
 c           | Reorder the computed upper triangular matrix. |
 c           %-----------------------------------------------%
 c
-            call ctrsen('None'       , 'V'          , select      ,
+            call AR_CTRSEN('None'       , 'V'          , select      ,
      &                   ncv          , workl(iuptri), ldh         ,
      &                   workl(invsub), ldq          , workl(iheig),
      &                   nconv2       , conds        , sep         , 
@@ -641,12 +641,12 @@ c        | the wanted invariant subspace located in the first NCONV |
 c        | columns of workl(invsub,ldq).                            |
 c        %----------------------------------------------------------%
 c
-         call cgeqr2(ncv , nconv , workl(invsub),
+         call AR_CGEQR2(ncv , nconv , workl(invsub),
      &                ldq , workev, workev(ncv+1),
      &                ierr)
 c
 c        %--------------------------------------------------------%
-c        | * Postmultiply V by Q using cunm2r.                    |
+c        | * Postmultiply V by Q using AR_CUNM2R.                    |
 c        | * Copy the first NCONV columns of VQ into Z.           |
 c        | * Postmultiply Z by R.                                 |
 c        | The N by NCONV matrix Z is now a matrix representation |
@@ -657,11 +657,11 @@ c        | associated with the upper triangular matrix of order   |
 c        | NCONV in workl(iuptri).                                |
 c        %--------------------------------------------------------%
 c
-         call cunm2r('Right', 'Notranspose', n            ,
+         call AR_CUNM2R('Right', 'Notranspose', n            ,
      &                ncv    , nconv        , workl(invsub),
      &                ldq    , workev       , v            ,
      &                ldv    , workd(n+1)   , ierr)
-         call clacpy('All', n, nconv, v, ldv, z, ldz)
+         call AR_CLACPY('All', n, nconv, v, ldv, z, ldz)
 c
          do 20 j=1, nconv
 c
@@ -674,8 +674,8 @@ c           | Note that since Q is orthogonal, R is a diagonal  |
 c           | matrix consisting of plus or minus ones.          |
 c           %---------------------------------------------------%
 c
-            if ( real( workl(invsub+(j-1)*ldq+j-1) ) .lt. 
-     &                  real(zero) ) then
+            if ( real ( workl(invsub+(j-1)*ldq+j-1) ) .lt. 
+     &                  real (zero) ) then
                call cscal(nconv, -one, workl(iuptri+j-1), ldq)
                call cscal(nconv, -one, workl(iuptri+(j-1)*ldq), 1)
             end if
@@ -697,7 +697,7 @@ c
                end if
  30         continue
 c
-            call ctrevc('Right', 'Select'     , select       ,
+            call AR_CTREVC('Right', 'Select'     , select       ,
      &                   ncv    , workl(iuptri), ldq          ,
      &                   vl     , 1            , workl(invsub),
      &                   ldq    , ncv          , outncv       ,
@@ -711,14 +711,14 @@ c
 c           %------------------------------------------------%
 c           | Scale the returning eigenvectors so that their |
 c           | Euclidean norms are all one. LAPACK subroutine |
-c           | ctrevc returns each eigenvector normalized so  |
+c           | AR_CTREVC returns each eigenvector normalized so  |
 c           | that the element of largest magnitude has      |
 c           | magnitude 1.                                   |
 c           %------------------------------------------------%
 c
             do 40 j=1, nconv
                   rtemp = scnrm2(ncv, workl(invsub+(j-1)*ldq), 1)
-                  rtemp = real(one) / rtemp
+                  rtemp = real (one) / rtemp
                   call csscal ( ncv, rtemp,
      &                 workl(invsub+(j-1)*ldq), 1 )
 c

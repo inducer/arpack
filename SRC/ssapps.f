@@ -91,12 +91,12 @@ c     TR95-13, Department of Computational and Applied Mathematics.
 c
 c\Routines called:
 c     ivout   ARPACK utility routine that prints integers. 
-c     arscnd  ARPACK utility routine for timing.
+c     ARSCND  ARPACK utility routine for timing.
 c     svout   ARPACK utility routine that prints vectors.
-c     slamch  LAPACK routine that determines machine constants.
-c     slartg  LAPACK Givens rotation construction routine.
-c     slacpy  LAPACK matrix copy routine.
-c     slaset  LAPACK matrix initialization routine.
+c     AR_SLAMCH  LAPACK routine that determines machine constants.
+c     AR_SLARTG  LAPACK Givens rotation construction routine.
+c     AR_SLACPY  LAPACK matrix copy routine.
+c     AR_SLASET  LAPACK matrix initialization routine.
 c     sgemv   Level 2 BLAS routine for matrix vector multiplication.
 c     saxpy   Level 1 BLAS that computes a vector triad.
 c     scopy   Level 1 BLAS that copies one vector to another.
@@ -175,16 +175,16 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   saxpy, scopy, sscal, slacpy, slartg, slaset, svout, 
-     &           ivout, arscnd, sgemv
+      external   saxpy, scopy, sscal, AR_SLACPY, AR_SLARTG, AR_SLASET, svout, 
+     &           ivout, ARSCND, sgemv
 c
 c     %--------------------%
 c     | External Functions |
 c     %--------------------%
 c
       Real
-     &           slamch
-      external   slamch
+     &           AR_SLAMCH
+      external   AR_SLAMCH
 c
 c     %----------------------%
 c     | Intrinsics Functions |
@@ -203,7 +203,7 @@ c     | Executable Statements |
 c     %-----------------------%
 c
       if (first) then
-         epsmch = slamch('Epsilon-Machine')
+         epsmch = AR_SLAMCH('Epsilon-Machine')
          first = .false.
       end if
       itop = 1
@@ -213,7 +213,7 @@ c     | Initialize timing statistics  |
 c     | & message level for debugging |
 c     %-------------------------------%
 c
-      call arscnd (t0)
+      call ARSCND (t0)
       msglvl = msapps
 c 
       kplusp = kev + np 
@@ -223,7 +223,7 @@ c     | Initialize Q to the identity matrix of order |
 c     | kplusp used to accumulate the rotations.     |
 c     %----------------------------------------------%
 c
-      call slaset ('All', kplusp, kplusp, zero, one, q, ldq)
+      call AR_SLASET ('All', kplusp, kplusp, zero, one, q, ldq)
 c
 c     %----------------------------------------------%
 c     | Quick return if there are no shifts to apply |
@@ -285,7 +285,7 @@ c           %--------------------------------------------------------%
 c
              f = h(istart,2) - shift(jj)
              g = h(istart+1,1)
-             call slartg (f, g, c, s, r)
+             call AR_SLARTG (f, g, c, s, r)
 c 
 c            %-------------------------------------------------------%
 c            | Apply rotation to the left and right of H;            |
@@ -338,7 +338,7 @@ c               | Final update with G(i-1,i,theta) |
 c               %----------------------------------%
 c
                 h(i+1,1) = c*h(i+1,1)
-                call slartg (f, g, c, s, r)
+                call AR_SLARTG (f, g, c, s, r)
 c
 c               %-------------------------------------------%
 c               | The following ensures that h(1:iend-1,1), |
@@ -468,7 +468,7 @@ c     %-------------------------------------------------%
 c     |  Move v(:,kplusp-kev+1:kplusp) into v(:,1:kev). |
 c     %-------------------------------------------------%
 c
-      call slacpy ('All', n, kev, v(1,np+1), ldv, v, ldv)
+      call AR_SLACPY ('All', n, kev, v(1,np+1), ldv, v, ldv)
 c 
 c     %--------------------------------------------%
 c     | Copy the (kev+1)-st column of (V*Q) in the |
@@ -503,7 +503,7 @@ c
          end if
       end if
 c
-      call arscnd (t1)
+      call ARSCND (t1)
       tsapps = tsapps + (t1 - t0)
 c 
  9000 continue 

@@ -65,7 +65,7 @@ c
 c\Routines called:
 c     ssortr  ARPACK utility sorting routine.
 c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
+c     ARSCND  ARPACK utility routine for timing.
 c     svout   ARPACK utility routine that prints vectors.
 c     scopy   Level 1 BLAS that copies one vector to another.
 c     sswap   Level 1 BLAS that swaps the contents of two vectors.
@@ -131,7 +131,7 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   sswap, scopy, ssortr, arscnd
+      external   sswap, scopy, ssortr, ARSCND
 c
 c     %---------------------%
 c     | Intrinsic Functions |
@@ -148,7 +148,7 @@ c     | Initialize timing statistics  |
 c     | & message level for debugging |
 c     %-------------------------------%
 c
-      call arscnd (t0)
+      call ARSCND (t0)
       msglvl = msgets
 c 
       if (which .eq. 'BE') then
@@ -198,7 +198,7 @@ c
          call scopy (np, ritz, 1, shifts, 1)
       end if
 c 
-      call arscnd (t1)
+      call ARSCND (t1)
       tsgets = tsgets + (t1 - t0)
 c
       if (msglvl .gt. 0) then

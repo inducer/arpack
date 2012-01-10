@@ -38,9 +38,9 @@ c\Local variables:
 c     xxxxxx  real
 c
 c\Routines called:
-c     arscnd  ARPACK utility routine for timing.
-c     slamch  LAPACK routine that determines machine constants.
-c     slapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
+c     ARSCND  ARPACK utility routine for timing.
+c     AR_SLAMCH  LAPACK routine that determines machine constants.
+c     AR_SLAPY2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
 c
 c\Author
 c     Danny Sorensen               Phuong Vu
@@ -100,8 +100,8 @@ c     | External Functions |
 c     %--------------------%
 c
       Real
-     &           slapy2, slamch
-      external   slapy2, slamch
+     &           AR_SLAPY2, AR_SLAMCH
+      external   AR_SLAPY2, AR_SLAMCH
 
 c     %-----------------------%
 c     | Executable Statements |
@@ -119,22 +119,22 @@ c     |                                                             |
 c     | for some appropriate choice of norm.                        |
 c     %-------------------------------------------------------------%
 c
-      call arscnd (t0)
+      call ARSCND (t0)
 c
 c     %---------------------------------%
 c     | Get machine dependent constant. |
 c     %---------------------------------%
 c
-      eps23 = slamch('Epsilon-Machine')
+      eps23 = AR_SLAMCH('Epsilon-Machine')
       eps23 = eps23**(2.0E+0 / 3.0E+0)
 c
       nconv  = 0
       do 20 i = 1, n
-         temp = max( eps23, slapy2( ritzr(i), ritzi(i) ) )
+         temp = max( eps23, AR_SLAPY2( ritzr(i), ritzi(i) ) )
          if (bounds(i) .le. tol*temp)   nconv = nconv + 1
    20 continue
 c 
-      call arscnd (t1)
+      call ARSCND (t1)
       tnconv = tnconv + (t1 - t0)
 c 
       return
